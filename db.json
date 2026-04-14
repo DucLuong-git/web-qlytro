@@ -1,0 +1,271 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Admin Master",
+      "email": "admin@test.com",
+      "password": "password123",
+      "role": "ADMIN",
+      "phone": "0901234567",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=admin"
+    },
+    {
+      "id": "2",
+      "name": "Staff Manager",
+      "email": "staff@test.com",
+      "password": "password123",
+      "role": "STAFF",
+      "phone": "0912345678",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=staff"
+    },
+    {
+      "id": "3",
+      "name": "Tenant User",
+      "email": "tenant@test.com",
+      "password": "password123",
+      "role": "TENANT",
+      "phone": "0987654321",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=tenant"
+    },
+    {
+      "id": "4",
+      "name": "Nguyen Van A",
+      "email": "nga@test.com",
+      "password": "password123",
+      "role": "TENANT",
+      "phone": "0381112222",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=nga"
+    },
+    {
+      "name": "TRAN DUC LUONG",
+      "email": "lt1739274@gmail.com",
+      "phone": "0363047965",
+      "password": "password123",
+      "role": "TENANT",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=TRAN DUC LUONG",
+      "id": "9fSZpuzh2VQ"
+    }
+  ],
+  "rooms": [
+    {
+      "id": "1",
+      "name": "Luxury Studio 101",
+      "price": 500,
+      "status": "Available",
+      "district": "District 1",
+      "address": "123 Nguyen Hue, D1, HCM",
+      "area": 45,
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "amenities": [
+        "Air Conditioning",
+        "High-Speed WiFi",
+        "Furnished",
+        "Balcony"
+      ],
+      "description": "A beautiful and modern studio apartment situated right in the heart of the city."
+    },
+    {
+      "id": "2",
+      "name": "Cozy Apt 102",
+      "price": 600,
+      "status": "Occupied",
+      "district": "Binh Thanh",
+      "address": "456 Xo Viet Nghe Tinh, HCM",
+      "area": 55,
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "amenities": [
+        "Air Conditioning",
+        "Washer/Dryer",
+        "Furnished",
+        "Parking"
+      ],
+      "description": "Quiet neighborhood, near universities and local markets."
+    },
+    {
+      "id": "3",
+      "name": "Penthouse Suite 103",
+      "price": 1200,
+      "status": "Available",
+      "district": "District 2",
+      "address": "Thao Dien, D2, HCM",
+      "area": 90,
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "amenities": [
+        "Air Conditioning",
+        "High-Speed WiFi",
+        "Furnished",
+        "Pool",
+        "Gym",
+        "Balcony"
+      ],
+      "description": "Luxurious penthouse with a breathtaking view of the river and top-tier amenities."
+    },
+    {
+      "id": "4",
+      "name": "Minimalist Room 104",
+      "price": 300,
+      "status": "Maintenance",
+      "district": "District 7",
+      "address": "Nguyen Van Linh, D7, HCM",
+      "area": 30,
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "amenities": [
+        "Air Conditioning",
+        "WiFi",
+        "Parking"
+      ],
+      "description": "Simple and compact room for students or single workers."
+    },
+    {
+      "id": "10",
+      "name": "Duplex Cửa Sổ Kính Lớn",
+      "price": 650,
+      "district": "Quận 3",
+      "status": "Available",
+      "type": "Chung Cư Mini",
+      "address": "22 Võ Văn Tần",
+      "description": "Duplex sang trọng phù hợp người nước ngoài.",
+      "amenities": [
+        "Bếp",
+        "Tivi",
+        "Gym",
+        "Hồ Bơi"
+      ]
+    },
+    {
+      "id": "11",
+      "name": "Nhà Nguyên Căn Full Đồ",
+      "price": 900,
+      "district": "Quận 7",
+      "status": "Occupied",
+      "type": "Nhà nguyên căn",
+      "address": "Him Lam Q7",
+      "description": "Gần Lotte Mart",
+      "amenities": [
+        "Sân Vườn"
+      ]
+    },
+    {
+      "id": "12",
+      "name": "Sleepbox Vip Có Massage",
+      "price": 150,
+      "district": "Gò Vấp",
+      "status": "Available",
+      "type": "KTX",
+      "address": "Đại Học Công Nghiệp",
+      "description": "Tối đa sinh viên",
+      "amenities": [
+        "Nước Free"
+      ]
+    },
+    {
+      "id": "13",
+      "name": "Phòng Trọ Siêu Cấp",
+      "price": 300,
+      "district": "Thủ Đức",
+      "status": "Available",
+      "type": "Phòng trọ",
+      "address": "ĐH Quốc Gia HCM",
+      "description": "Đang trống dọn vào ngay",
+      "amenities": [
+        "Giữ Xe Máy"
+      ]
+    },
+    {
+      "id": "14",
+      "name": "Khu Trọ Cao Cấp Quận 10",
+      "price": 420,
+      "district": "Quận 10",
+      "status": "Available",
+      "type": "Phòng trọ",
+      "address": "Tô Hiến Thành",
+      "description": "Đang trống dọn vào ngay",
+      "amenities": [
+        "Ban công"
+      ]
+    },
+    {
+      "id": "P7jMZvO_ifo",
+      "name": "Phòng Vip 2 Người",
+      "price": 300,
+      "status": "Available",
+      "type": "Phòng trọ",
+      "district": "Nam Từ Liêm",
+      "address": "150 Phạm Văn Đồng, Nam Từ Liêm, Hà Nội",
+      "amenities": ["WiFi", "Máy Lạnh"]
+    }
+  ],
+  "tenants": [
+    {
+      "id": "1",
+      "name": "John Doe",
+      "phone": "123-456-7890",
+      "email": "johndoe@gmail.com",
+      "roomId": "2",
+      "startDate": "2025-01-01"
+    },
+    {
+      "id": "2",
+      "name": "Nguyen Van A",
+      "phone": "0381112222",
+      "email": "nga@test.com",
+      "roomId": "4",
+      "startDate": "2026-02-15"
+    }
+  ],
+  "contracts": [
+    {
+      "id": "1",
+      "tenantId": "1",
+      "roomId": "2",
+      "deposit": 600,
+      "durationMonths": 12,
+      "status": "Active",
+      "createdDate": "2025-01-01"
+    }
+  ],
+  "posts": [],
+  "logs": [
+    {
+      "id": "1",
+      "user": "Admin Master",
+      "role": "ADMIN",
+      "action": "CREATE",
+      "module": "Room Management",
+      "details": "Added new room \"Sunset Condo\"",
+      "timestamp": "2026-04-10T07:05:05.671Z"
+    },
+    {
+      "id": "2",
+      "user": "Staff Manager",
+      "role": "STAFF",
+      "action": "UPDATE",
+      "module": "Tenant Management",
+      "details": "Updated tenant information ID: T-2",
+      "timestamp": "2026-04-10T08:35:05.672Z"
+    },
+    {
+      "id": "3",
+      "user": "Admin Master",
+      "role": "ADMIN",
+      "action": "DELETE",
+      "module": "Room Management",
+      "details": "Deleted room ID: 5",
+      "timestamp": "2026-04-09T09:05:05.672Z"
+    },
+    {
+      "id": "4",
+      "user": "System (CronJob)",
+      "role": "SYSTEM",
+      "action": "AUTOMATION",
+      "module": "Billing",
+      "details": "Auto-generated end-of-month invoices for 12 tenants",
+      "timestamp": "2026-04-10T08:58:25.672Z"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

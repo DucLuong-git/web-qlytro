@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: fpl-home-web-app
+    env: node
+    # Build lệnh kết hợp: Cài đặt Dependencies Frontend -> Build Vite -> Cài đặt Dependencies Backend
+    buildCommand: npm install && npm run build && cd server && npm install
+    # Bỏ qua thư mục Frontend, tự động di chuyển sang mục Server chạy Node
+    startCommand: cd server && npm start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false # Sếp sẽ nhập chuỗi kết nối thực tế trên Dashboard của Render trong lúc setup
+      - key: JWT_SECRET
+        generateValue: true # Render sẽ tự động sinh mật khẩu bảo mật siêu cấp ngẫu nhiên cho Sếp
+      - key: JWT_EXPIRES_IN
+        value: 7d
+    autoDeploy: true

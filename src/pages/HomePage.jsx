@@ -70,7 +70,7 @@ const HomePage = () => {
             </div>
             <Link 
               to="/rooms" 
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-2xl md:rounded-2xl transition-all shadow-lg hover:shadow-indigo-500/40 flex items-center justify-center whitespace-nowrap active:scale-95"
+              className="bg-primary-500 hover:bg-primary-600 text-white font-bold py-4 px-8 rounded-2xl md:rounded-2xl transition-all shadow-lg hover:shadow-primary-500/40 flex items-center justify-center whitespace-nowrap active:scale-95"
             >
               <Search className="w-5 h-5 md:mr-2" />
               <span className="hidden md:inline">Tìm kiếm</span>
@@ -173,7 +173,7 @@ const HomePage = () => {
                 { icon: Wallet, title: 'Thanh Toán Ngân Hàng', desc: 'Ký hợp đồng và thanh toán VNPay Online trực tiếp.' }
               ].map((ft, idx) => (
                 <motion.div key={idx} variants={fadeUp} className="flex flex-col items-center group">
-                   <div className="w-20 h-20 rounded-3xl bg-white dark:bg-slate-800 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] group-hover:shadow-[0_10px_40px_-10px_rgba(79,70,229,0.5)] flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-8 border border-slate-100 dark:border-slate-700 transition-all duration-300 group-hover:-translate-y-2 group-hover:bg-indigo-600 group-hover:text-white group-hover:scale-110">
+                   <div className="w-20 h-20 rounded-3xl bg-white dark:bg-slate-800 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] group-hover:shadow-[0_10px_40px_-10px_rgba(16,185,129,0.5)] flex items-center justify-center text-primary-600 dark:text-primary-400 mb-8 border border-slate-100 dark:border-slate-700 transition-all duration-300 group-hover:-translate-y-2 group-hover:bg-primary-600 group-hover:text-white group-hover:scale-110">
                       <ft.icon className="w-10 h-10" />
                    </div>
                    <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{ft.title}</h4>
@@ -190,7 +190,7 @@ const HomePage = () => {
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
-        className="py-24 bg-gradient-to-br from-indigo-600 to-purple-700 text-white text-center rounded-[3rem] mx-4 sm:mx-10 mb-10 shadow-2xl overflow-hidden relative border-4 border-indigo-400/20"
+        className="py-24 bg-gradient-to-br from-primary-500 to-primary-700 text-white text-center rounded-[3rem] mx-4 sm:mx-10 mb-10 shadow-2xl overflow-hidden relative border-4 border-primary-400/20"
       >
         <div className="absolute inset-0 z-0">
           <motion.div 
@@ -206,9 +206,9 @@ const HomePage = () => {
         </div>
         <div className="relative z-10 container mx-auto px-4 max-w-4xl">
           <h2 className="text-4xl md:text-6xl font-black mb-8 tracking-tight drop-shadow-lg">Bạn Có Nhà Trống Cho Thuê?</h2>
-          <p className="text-indigo-100 text-xl font-medium mb-12 opacity-90 drop-shadow-sm leading-relaxed max-w-3xl mx-auto">Vươn ra biển lớn. Bắt đầu phân phối sản phẩm lưu trú của mình đến tay hàng triệu sinh viên trên toàn quốc với App Quản Lý Thu Tiền tự động miễn phí!</p>
+          <p className="text-primary-100 text-xl font-medium mb-12 opacity-90 drop-shadow-sm leading-relaxed max-w-3xl mx-auto">Vươn ra biển lớn. Bắt đầu phân phối sản phẩm lưu trú của mình đến tay hàng triệu sinh viên trên toàn quốc với App Quản Lý Thu Tiền tự động miễn phí!</p>
           <div className="flex justify-center">
-            <Link to="/post-room" className="inline-flex py-5 px-10 rounded-full bg-white text-indigo-700 font-extrabold text-lg hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] hover:scale-105 transition-all shadow-xl active:scale-95 leading-none items-center">
+            <Link to="/post-room" className="inline-flex py-5 px-10 rounded-full bg-white text-primary-700 font-extrabold text-lg hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] hover:scale-105 transition-all shadow-xl active:scale-95 leading-none items-center">
                <Building2 className="w-6 h-6 mr-3" /> Đăng Ký Quản Trị Tổ Chức FPL Ngay
             </Link>
           </div>

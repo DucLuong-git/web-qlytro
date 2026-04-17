@@ -55,20 +55,20 @@ const MainLayout = () => {
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
             </button>
             <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-lg group-hover:scale-110 transition-transform tracking-tight">DL</div>
-              <span className="text-xl font-extrabold tracking-tight hidden sm:block text-slate-800 dark:text-white">Đức Lương <span className="text-indigo-600 dark:text-indigo-400">Home</span></span>
+              <div className="w-9 h-9 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 font-black text-sm shadow-sm group-hover:scale-105 transition-transform tracking-tight">DL</div>
+              <span className="text-xl font-extrabold tracking-tight hidden sm:block text-slate-800 dark:text-white">Đức Lương <span className="text-primary-500 dark:text-primary-400">Home</span></span>
             </Link>
           </div>
           
           <nav className="hidden lg:flex space-x-8 items-center">
-            <Link to="/" className="text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+            <Link to="/" className="text-sm font-semibold text-text-muted hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               Trang Chủ
             </Link>
-            <Link to="/rooms" className="text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+            <Link to="/rooms" className="text-sm font-semibold text-text-muted hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               Tìm Phòng
             </Link>
             {isAuthenticated && (user?.role === 'ADMIN' || user?.role === 'STAFF') && (
-              <Link to="/post-room" className="text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+              <Link to="/post-room" className="text-sm font-semibold text-text-muted hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                 Đăng Phóng Mới
               </Link>
             )}
@@ -119,28 +119,28 @@ const MainLayout = () => {
                 <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
                 <div className="flex items-center gap-3 ml-1 relative group cursor-pointer">
                   <div className="hidden md:block text-right">
-                    <div className="text-sm font-bold text-slate-800 dark:text-white leading-tight">{user?.name}</div>
-                    <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">{user?.role}</div>
+                    <div className="text-sm font-semibold text-slate-800 dark:text-white leading-tight">{user?.name}</div>
+                    <div className="text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-widest">{user?.role}</div>
                   </div>
                   
                   {/* Dropdown Profile */}
                   <div className="absolute right-0 top-full mt-4 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                     <div className="p-2 space-y-1">
-                      <Link to="/dashboard" className="block px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors">Bảng Điều Khiển</Link>
-                      <Link to="/profile" className="block px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors">Hồ Sơ Cá Nhân</Link>
+                      <Link to="/dashboard" className="block px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors">Bảng Điều Khiển</Link>
+                      <Link to="/profile" className="block px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors">Hồ Sơ Cá Nhân</Link>
                       
                       {(user?.role === 'ADMIN' || user?.role === 'STAFF') && (
                         <>
                           <div className="h-px bg-slate-100 dark:bg-slate-700 my-1 mx-2"></div>
-                          <Link to="/admin" className="block px-4 py-2.5 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-xl transition-colors">Quản Trị Hệ Thống</Link>
-                          <Link to="/post-room" className="block px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors">Đăng Phòng Mới</Link>
+                          <Link to="/admin" className="block px-4 py-2.5 text-sm font-semibold text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-xl transition-colors">Quản Trị Hệ Thống</Link>
+                          <Link to="/post-room" className="block px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors">Đăng Phòng Mới</Link>
                         </>
                       )}
                       
                       <div className="h-px bg-slate-100 dark:bg-slate-700 my-1 mx-2"></div>
                       <button 
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-2.5 text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
+                        className="w-full text-left px-4 py-2.5 text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
                       >
                         Đăng Xuất
                       </button>
@@ -150,10 +150,10 @@ const MainLayout = () => {
               </div>
             ) : (
                <div className="hidden sm:flex items-center gap-3 ml-2">
-                <Link to="/login" className="text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                <Link to="/login" className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                   Đăng Nhập
                 </Link>
-                <Link to="/register" className="text-sm font-bold bg-indigo-600 text-white px-5 py-2.5 rounded-full hover:bg-indigo-700 transition-all shadow-md active:scale-95">
+                <Link to="/register" className="text-sm font-semibold bg-primary-500 text-white px-5 py-2.5 rounded-xl hover:bg-primary-600 transition-all shadow-sm active:scale-95">
                   Đăng Ký Khách Thuê
                 </Link>
               </div>
@@ -235,8 +235,8 @@ const MainLayout = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
             <div className="md:col-span-1">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-lg tracking-tight">DL</div>
-                <span className="font-extrabold text-white text-xl tracking-tight">Đức Lương <span className="text-indigo-400">Home</span></span>
+                <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 font-black text-sm shadow-sm tracking-tight">DL</div>
+                <span className="font-extrabold text-white text-xl tracking-tight">Đức Lương <span className="text-primary-500">Home</span></span>
               </div>
               <p className="text-sm text-slate-400 font-medium leading-relaxed">
                 Nền tảng tìm kiếm và quản lý phòng trọ số 1 dành cho sinh viên và người lao động trẻ. Uy tín, nhanh chóng, minh bạch.
@@ -256,9 +256,9 @@ const MainLayout = () => {
             <div>
               <h4 className="text-white font-bold mb-4">Hỗ Trợ</h4>
               <ul className="space-y-3 text-sm text-slate-400 font-medium">
-                <li><Link to="/info/terms" className="hover:text-indigo-400 transition-colors">Quy chế hoạt động</Link></li>
-                <li><Link to="/info/faq" className="hover:text-indigo-400 transition-colors">Câu hỏi thường gặp</Link></li>
-                <li><Link to="/info/privacy" className="hover:text-indigo-400 transition-colors">Chính sách bảo mật</Link></li>
+                <li><Link to="/info/terms" className="hover:text-primary-400 transition-colors">Quy chế hoạt động</Link></li>
+                <li><Link to="/info/faq" className="hover:text-primary-400 transition-colors">Câu hỏi thường gặp</Link></li>
+                <li><Link to="/info/privacy" className="hover:text-primary-400 transition-colors">Chính sách bảo mật</Link></li>
                 <li><Link to="/report" className="hover:text-rose-400 transition-colors">Báo cáo vi phạm</Link></li>
               </ul>
             </div>
@@ -275,12 +275,12 @@ const MainLayout = () => {
           
           <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
              <p className="text-xs font-semibold text-slate-500">
-               &copy; {new Date().getFullYear()} Bản quyền thuộc về <span className="text-indigo-400 font-bold">Đức Lương Home</span>. Giải Pháp Quản Lý Phòng Trọ Thông Minh.
+               &copy; {new Date().getFullYear()} Bản quyền thuộc về <span className="text-primary-500 font-bold">Đức Lương Home</span>. Giải Pháp Quản Lý Phòng Trọ Thông Minh.
              </p>
              <div className="flex gap-4">
-               <div className="w-8 h-8 rounded-full bg-slate-800 hover:bg-indigo-600 transition-colors cursor-pointer border border-slate-700"></div>
-               <div className="w-8 h-8 rounded-full bg-slate-800 hover:bg-indigo-600 transition-colors cursor-pointer border border-slate-700"></div>
-               <div className="w-8 h-8 rounded-full bg-slate-800 hover:bg-indigo-600 transition-colors cursor-pointer border border-slate-700"></div>
+               <div className="w-8 h-8 rounded-full bg-slate-800 hover:bg-primary-600 transition-colors cursor-pointer border border-slate-700"></div>
+               <div className="w-8 h-8 rounded-full bg-slate-800 hover:bg-primary-600 transition-colors cursor-pointer border border-slate-700"></div>
+               <div className="w-8 h-8 rounded-full bg-slate-800 hover:bg-primary-600 transition-colors cursor-pointer border border-slate-700"></div>
              </div>
           </div>
         </div>

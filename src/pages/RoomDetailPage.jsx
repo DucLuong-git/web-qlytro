@@ -103,12 +103,12 @@ const RoomDetailPage = () => {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 w-full animate-in fade-in duration-500">
       <button 
         onClick={() => navigate(-1)} 
-        className="flex items-center text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors mb-6 font-bold bg-white dark:bg-slate-800 px-5 py-2.5 rounded-full shadow-sm w-fit border border-slate-100 dark:border-slate-700"
+        className="flex items-center text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mb-6 font-semibold bg-white dark:bg-slate-800 px-5 py-2.5 rounded-full shadow-sm w-fit border border-slate-100 dark:border-slate-700"
       >
-        <ArrowLeft className="w-4 h-4 mr-2" /> Quay Trở Về Danh Sách
+        <ArrowLeft className="w-4 h-4 mr-2" /> Quay Trở Về
       </button>
 
-      <div className="bg-white dark:bg-slate-800 rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100 dark:border-slate-700/60 transition-colors">
+      <div className="bg-white dark:bg-slate-800 rounded-[2.5rem] overflow-hidden shadow-sm border border-slate-100 dark:border-slate-700/60 transition-colors">
         <div className="relative h-64 sm:h-80 md:h-[450px] w-full group">
           <img 
             src={getImageUrl(room.id)} 
@@ -126,9 +126,9 @@ const RoomDetailPage = () => {
             </button>
             <button 
               onClick={toggleBookmark}
-              className="p-3.5 rounded-full bg-white/20 hover:bg-white/90 backdrop-blur-md shadow-lg text-white hover:text-indigo-600 transition-all hover:scale-110 active:scale-95"
+              className="p-3.5 rounded-full bg-white/20 hover:bg-white/90 backdrop-blur-md shadow-lg text-white hover:text-primary-600 transition-all hover:scale-110 active:scale-95"
             >
-              <BookmarkPlus className={`w-6 h-6 ${bookmarks.includes(room.id) ? 'fill-indigo-600 text-indigo-600' : ''}`} />
+              <BookmarkPlus className={`w-6 h-6 ${bookmarks.includes(room.id) ? 'fill-primary-600 text-primary-600' : ''}`} />
             </button>
           </div>
           
@@ -150,23 +150,23 @@ const RoomDetailPage = () => {
                   {room.status === 'Available' ? 'Phòng Trống (Available)' : 'Đang Thuê (Occupied)'}
                 </span>
                 <span className="flex items-center text-slate-600 dark:text-slate-300 text-xs font-bold bg-slate-100 dark:bg-slate-700/50 px-4 py-2 rounded-full border border-slate-200 dark:border-slate-600">
-                  <MapPin className="w-4 h-4 mr-1.5 text-indigo-500" /> {room.district || 'Hồ Chí Minh'}
+                  <MapPin className="w-4 h-4 mr-1.5 text-primary-500" /> {room.district || 'Hồ Chí Minh'}
                 </span>
               </div>
               <h1 className="text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">{room.name}</h1>
             </div>
             
-            <div className="bg-gradient-to-b from-indigo-50 to-white dark:from-indigo-900/30 dark:to-slate-800 px-10 py-6 rounded-3xl text-center shadow-lg shadow-indigo-100/50 dark:shadow-none border border-indigo-100 dark:border-indigo-800/50">
-              <div className="text-sm font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-widest mb-2 border-b border-indigo-100 dark:border-indigo-800/50 pb-2">Giá Thuê Trọn Gói</div>
-              <div className="text-5xl font-black text-indigo-700 dark:text-indigo-300 drop-shadow-sm">${room.price}</div>
-              <div className="text-xs text-indigo-400 dark:text-indigo-500 font-bold mt-2">/ tháng (Chưa Điện Nước)</div>
+            <div className="bg-gradient-to-b from-primary-50 to-white dark:from-primary-900/30 dark:to-slate-800 px-10 py-6 rounded-3xl text-center shadow-sm dark:shadow-none border border-primary-100 dark:border-primary-800/50">
+              <div className="text-sm font-bold text-primary-500 dark:text-primary-400 uppercase tracking-widest mb-2 border-b border-primary-100 dark:border-primary-800/50 pb-2">Giá Thuê Trọn Gói</div>
+              <div className="text-5xl font-black text-primary-700 dark:text-primary-300 drop-shadow-sm">${room.price}</div>
+              <div className="text-xs text-primary-400 dark:text-primary-500 font-bold mt-2">/ tháng (Chưa Điện Nước)</div>
             </div>
           </div>
 
           {/* Mobile Rent Box */}
-          <div className="lg:hidden bg-indigo-50 dark:bg-indigo-900/30 px-6 py-5 rounded-3xl flex justify-between items-center mb-8 border border-indigo-100 dark:border-indigo-800/50 shadow-inner">
-             <div className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Giá Trọn Gói</div>
-             <div className="text-4xl font-black text-indigo-700 dark:text-indigo-300">${room.price}</div>
+          <div className="lg:hidden bg-primary-50 dark:bg-primary-900/30 px-6 py-5 rounded-3xl flex justify-between items-center mb-8 border border-primary-100 dark:border-primary-800/50 shadow-inner">
+             <div className="text-sm font-bold text-primary-600 dark:text-primary-400 uppercase tracking-widest">Giá Trọn Gói</div>
+             <div className="text-4xl font-black text-primary-700 dark:text-primary-300">${room.price}</div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -175,7 +175,7 @@ const RoomDetailPage = () => {
               {/* Giới thiệu */}
               <section>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-5 flex items-center">
-                  <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 p-2 rounded-xl mr-3">
+                  <span className="bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400 p-2 rounded-xl mr-3">
                      <HomeIcon className="w-5 h-5" />
                   </span>
                   Mô Tả Nền & Tiện Ích
@@ -220,7 +220,7 @@ const RoomDetailPage = () => {
 
               {/* Comment Section */}
               <section className="bg-slate-50 dark:bg-slate-900/50 p-6 md:p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700/50 shadow-inner">
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Thảo Luận Phòng Thử <span className="text-indigo-500 font-black text-xl ml-2">({comments.length})</span></h3>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Thảo Luận Phòng Thử <span className="text-primary-500 font-black text-xl ml-2">({comments.length})</span></h3>
                 
                 <form onSubmit={handleAddComment} className="mb-8 relative">
                   <input
@@ -228,12 +228,12 @@ const RoomDetailPage = () => {
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     placeholder="Bình luận hoặc hỏi đáp về phòng trọ này..."
-                    className="w-full pl-6 pr-16 py-5 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-sm transition-all outline-none"
+                    className="w-full pl-6 pr-16 py-5 rounded-2xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 shadow-sm transition-all outline-none"
                   />
                   <button 
                     type="submit" 
                     disabled={!newComment.trim()}
-                    className="absolute right-2 top-2 bottom-2 aspect-square flex items-center justify-center bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 transition-all shadow-md active:scale-95"
+                    className="absolute right-2 top-2 bottom-2 aspect-square flex items-center justify-center bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 transition-all shadow-md active:scale-95"
                   >
                     <Send className="w-5 h-5 ml-1" />
                   </button>

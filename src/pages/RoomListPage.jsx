@@ -16,10 +16,10 @@ const HERO_SLIDES = [
 ];
 
 const CATEGORIES = [
-  { label: 'Tất Cả', icon: Home, color: 'from-indigo-500 to-violet-600', filter: '' },
+  { label: 'Tất Cả', icon: Home, color: 'from-primary-500 to-primary-600', filter: '' },
   { label: 'Chung Cư', icon: Building2, color: 'from-emerald-500 to-teal-600', filter: 'Chung Cư Mini' },
-  { label: 'Phòng Trọ', icon: Home, color: 'from-orange-500 to-rose-500', filter: 'Phòng trọ' },
-  { label: 'KTX', icon: Shield, color: 'from-blue-500 to-cyan-600', filter: 'KTX' },
+  { label: 'Phòng Trọ', icon: Home, color: 'from-orange-400 to-amber-500', filter: 'Phòng trọ' },
+  { label: 'KTX', icon: Shield, color: 'from-cyan-500 to-blue-500', filter: 'KTX' },
 ];
 
 const ROOM_IMAGES = [
@@ -120,8 +120,8 @@ export default function RoomListPage() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.7 }}
                   >
-                    <span className="inline-flex items-center gap-2 text-xs font-black text-indigo-300 uppercase tracking-[0.3em] mb-4 bg-indigo-900/50 px-4 py-2 rounded-full border border-indigo-700/50 backdrop-blur-sm">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+                    <span className="inline-flex items-center gap-2 text-xs font-black text-primary-300 uppercase tracking-[0.3em] mb-4 bg-primary-900/50 px-4 py-2 rounded-full border border-primary-700/50 backdrop-blur-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
                       {i + 1}/{HERO_SLIDES.length} · Đức Lương Home
                     </span>
                     <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-3 leading-tight drop-shadow-2xl">
@@ -132,10 +132,10 @@ export default function RoomListPage() {
                     </p>
                     <div className="flex flex-wrap gap-3">
                       <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-xl text-sm font-bold border border-white/20">
-                        <Zap className="w-4 h-4 text-yellow-400" /> {available} phòng đang trống
+                        <Zap className="w-4 h-4 text-emerald-400" /> {available} phòng đang trống
                       </span>
                       <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-xl text-sm font-bold border border-white/20">
-                        <TrendingUp className="w-4 h-4 text-emerald-400" /> {rooms.length}+ căn hộ
+                        <TrendingUp className="w-4 h-4 text-primary-400" /> {rooms.length}+ căn hộ
                       </span>
                     </div>
                   </motion.div>
@@ -151,13 +151,13 @@ export default function RoomListPage() {
         <div className="max-w-5xl mx-auto px-4 py-5">
           <div className="flex flex-col md:flex-row gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500 pointer-events-none" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-500 pointer-events-none" />
               <input
                 type="text"
                 placeholder="Tìm theo tên phòng, quận, địa chỉ..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white font-medium outline-none focus:border-indigo-400 transition-all placeholder:text-slate-400"
+                className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-medium outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all placeholder:text-slate-400"
               />
             </div>
             <div className="relative">
@@ -165,7 +165,7 @@ export default function RoomListPage() {
               <select
                 value={priceFilter}
                 onChange={e => setPriceFilter(e.target.value)}
-                className="pl-11 pr-8 py-3.5 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white font-bold outline-none focus:border-indigo-400 cursor-pointer appearance-none w-full md:w-auto"
+                className="pl-11 pr-8 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-bold outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 cursor-pointer appearance-none w-full md:w-auto"
               >
                 <option value="all">Tất cả giá</option>
                 <option value="u300">Dưới $300</option>
@@ -175,7 +175,7 @@ export default function RoomListPage() {
             </div>
             <Link
               to="/rooms"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3.5 rounded-2xl transition-all shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 hover:scale-105 active:scale-95 whitespace-nowrap"
+              className="bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3.5 rounded-lg transition-all shadow-sm shadow-primary-500/30 flex items-center justify-center gap-2 focus:ring-4 focus:ring-primary-500/30 active:scale-95 whitespace-nowrap"
             >
               <Search className="w-4 h-4" /> Tìm Ngay
             </Link>
@@ -210,14 +210,14 @@ export default function RoomListPage() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">
-              {filtered.length} <span className="text-indigo-600 dark:text-indigo-400">phòng</span> phù hợp
+              {filtered.length} <span className="text-primary-600 dark:text-primary-400">phòng</span> phù hợp
             </h2>
             <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-0.5">Cập nhật mới nhất hôm nay</p>
           </div>
           <div className="flex gap-2">
             {['grid', 'list'].map(v => (
               <button key={v} onClick={() => setView(v)}
-                className={`p-2.5 rounded-xl border-2 transition-all ${view === v ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-300'}`}
+                className={`p-2.5 rounded-xl border border-slate-200 transition-all ${view === v ? 'bg-primary-50 border-primary-500 text-primary-600' : 'bg-white dark:bg-slate-800 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-primary-300'}`}
               >
                 {v === 'grid'
                   ? <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M1 2.5A1.5 1.5 0 012.5 1h3A1.5 1.5 0 017 2.5v3A1.5 1.5 0 015.5 7h-3A1.5 1.5 0 011 5.5v-3zm8 0A1.5 1.5 0 0110.5 1h3A1.5 1.5 0 0115 2.5v3A1.5 1.5 0 0113.5 7h-3A1.5 1.5 0 019 5.5v-3zm-8 8A1.5 1.5 0 012.5 9h3A1.5 1.5 0 017 10.5v3A1.5 1.5 0 015.5 15h-3A1.5 1.5 0 011 13.5v-3zm8 0A1.5 1.5 0 0110.5 9h3A1.5 1.5 0 0115 10.5v3A1.5 1.5 0 0113.5 15h-3A1.5 1.5 0 019 13.5v-3z"/></svg>
@@ -260,82 +260,65 @@ export default function RoomListPage() {
                 {filtered.map((room, i) => (
                   <motion.div key={room.id} custom={i} variants={cardVariants} initial="hidden" animate="visible">
                     <Link to={`/rooms/${room.id}`}
-                      className="group block bg-white dark:bg-slate-800 rounded-[1.8rem] overflow-hidden border-2 border-slate-100 dark:border-slate-700/60 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/10 h-full"
+                      className="group flex flex-col bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-100 shadow-sm dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary-500/10 h-full"
                     >
                       {/* Image */}
-                      <div className="relative h-52 overflow-hidden">
+                      <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
                         <img src={room.image || getImage(room.id)} alt={room.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                           loading="lazy"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/5" />
 
                         {/* Status Badge */}
                         <div className="absolute top-3 left-3">
-                          <span className={`px-3 py-1.5 rounded-xl text-xs font-black tracking-wide shadow-lg backdrop-blur-sm border
+                          <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase border bg-white/90 backdrop-blur-sm
                             ${room.status === 'Available'
-                              ? 'bg-emerald-500/90 text-white border-emerald-400'
-                              : 'bg-orange-500/90 text-white border-orange-400'
+                              ? 'text-primary-600 border-primary-100'
+                              : 'text-orange-600 border-orange-100'
                             }`}>
-                            {room.status === 'Available' ? '✓ Phòng Trống' : '◷ Đang Thuê'}
+                            {room.status === 'Available' ? 'Còn trống' : 'Đã thuê'}
                           </span>
                         </div>
 
                         {/* Action buttons */}
-                        <div className="absolute top-3 right-3 flex gap-1.5">
+                        <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button onClick={e => { e.preventDefault(); toggle(setLikes, likes, room.id); }}
-                            className={`p-2.5 rounded-xl backdrop-blur-md transition-all shadow-md hover:scale-110
+                            className={`p-2 rounded-full backdrop-blur-md transition-all shadow-md hover:scale-110
                               ${likes.includes(room.id)
                                 ? 'bg-red-500 text-white'
-                                : 'bg-white/20 text-white hover:bg-white hover:text-red-500'}`}
+                                : 'bg-white/80 text-slate-400 hover:bg-white hover:text-red-500'}`}
                           >
                             <Heart className={`w-4 h-4 ${likes.includes(room.id) ? 'fill-white' : ''}`} />
                           </button>
-                          <button onClick={e => { e.preventDefault(); toggle(setBookmarks, bookmarks, room.id); }}
-                            className={`p-2.5 rounded-xl backdrop-blur-md transition-all shadow-md hover:scale-110
-                              ${bookmarks.includes(room.id)
-                                ? 'bg-indigo-500 text-white'
-                                : 'bg-white/20 text-white hover:bg-white hover:text-indigo-600'}`}
-                          >
-                            <Bookmark className={`w-4 h-4 ${bookmarks.includes(room.id) ? 'fill-white' : ''}`} />
-                          </button>
                         </div>
-
-                        {/* Type tag */}
-                        {room.type && (
-                          <div className="absolute bottom-3 right-3">
-                            <span className="text-[10px] font-black text-white bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-lg uppercase tracking-widest border border-white/20">{room.type}</span>
-                          </div>
-                        )}
                       </div>
 
                       {/* Content */}
-                      <div className="p-5">
-                        <h3 className="font-extrabold text-base text-slate-900 dark:text-white mb-1.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">{room.name}</h3>
-                        <div className="flex items-center text-slate-500 dark:text-slate-400 text-xs mb-4 font-medium">
-                          <MapPin className="w-3.5 h-3.5 mr-1.5 text-indigo-500 flex-shrink-0" />
+                      <div className="p-4 flex flex-col flex-grow">
+                        <h3 className="font-semibold text-[1.1rem] text-text-main dark:text-white mb-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-1">{room.name}</h3>
+                        <div className="flex items-center text-text-muted text-xs mb-3 font-medium">
+                          <MapPin className="w-3.5 h-3.5 mr-1.5 flex-shrink-0" />
                           <span className="truncate">{room.district || 'Khu vực trung tâm'}</span>
                         </div>
 
                         {/* Amenities mini tags */}
                         {room.amenities?.length > 0 && (
-                          <div className="flex gap-1.5 flex-wrap mb-4">
-                            {room.amenities.slice(0, 3).map(a => (
-                              <span key={a} className="text-[10px] font-bold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-lg border border-indigo-100 dark:border-indigo-800">{a}</span>
+                          <div className="flex gap-2 flex-wrap mb-4 mt-auto">
+                            {room.amenities.slice(0, 2).map(a => (
+                              <span key={a} className="text-[10px] font-medium bg-slate-50 dark:bg-slate-700 text-text-muted px-2 py-1 rounded-md">{a}</span>
                             ))}
-                            {room.amenities.length > 3 && <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-lg">+{room.amenities.length - 3}</span>}
+                            {room.amenities.length > 2 && <span className="text-[10px] font-medium text-text-muted bg-slate-50 dark:bg-slate-700 px-2 py-1 rounded-md">+{room.amenities.length - 2}</span>}
                           </div>
                         )}
 
-                        <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700">
+                        <div className="flex items-end justify-between pt-3 border-t border-slate-100 dark:border-slate-700">
                           <div>
-                            <span className="text-xl font-black text-indigo-600 dark:text-indigo-400">{formatPrice(room.price)}</span>
-                            <span className="text-xs text-slate-400 font-medium ml-1">/tháng</span>
+                            <span className="block text-[10px] font-medium text-text-muted mb-0.5 uppercase tracking-wider">Giá thuê</span>
+                            <span className="text-lg font-bold text-primary-600 dark:text-primary-400">{formatPrice(room.price)}<span className="text-xs font-normal text-slate-400 ml-1">/th</span></span>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                            <span className="text-xs font-bold text-slate-600 dark:text-slate-400">4.{(parseInt(room.id) || 5) % 10}</span>
-                          </div>
+                          <button className="h-8 px-4 text-[13px] font-medium rounded-xl border border-primary-500 text-primary-500 hover:bg-primary-50 transition-colors">
+                            Xem ngay
+                          </button>
                         </div>
                       </div>
                     </Link>

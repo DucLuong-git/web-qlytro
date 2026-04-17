@@ -13,6 +13,7 @@ const logRoutes     = require('./routes/logs');
 const contractRoutes= require('./routes/contracts');
 const userRoutes    = require('./routes/users');
 const reportRoutes  = require('./routes/reports');
+const vnpayRoutes   = require('./routes/vnpay');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -41,6 +42,7 @@ app.use('/api/tenants',   tenantRoutes);
 app.use('/api/logs',      logRoutes);
 app.use('/api/contracts', contractRoutes);
 app.use('/api/reports',   reportRoutes);
+app.use('/api/vnpay',     vnpayRoutes);
 
 // ─── Health Check ─────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {

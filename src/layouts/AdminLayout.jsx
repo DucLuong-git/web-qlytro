@@ -8,7 +8,8 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   AppstoreOutlined,
-  HistoryOutlined
+  HistoryOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 import { Moon, Sun } from 'lucide-react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
@@ -49,6 +50,11 @@ const AdminLayout = () => {
       key: '/admin/logs',
       icon: <HistoryOutlined />,
       label: 'Lịch Sử Hoạt Động',
+    },
+    {
+      key: '/admin/invoices',
+      icon: <FileTextOutlined />,
+      label: 'Hóa Đơn & Chỉ Số',
     },
   ];
 

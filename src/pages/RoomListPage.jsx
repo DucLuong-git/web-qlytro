@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Heart, Bookmark, MapPin, Filter, Home, Building2, Shield, Star, Zap, TrendingUp } from 'lucide-react';
+import { Search, Heart, Bookmark, MapPin, Filter, Home, Building2, Shield, Star, Zap, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, EffectFade } from 'swiper/modules';
 import 'swiper/css';
@@ -16,10 +16,10 @@ const HERO_SLIDES = [
 ];
 
 const CATEGORIES = [
-  { label: 'Tất Cả', icon: Home, color: 'from-primary-500 to-primary-600', filter: '' },
-  { label: 'Chung Cư', icon: Building2, color: 'from-emerald-500 to-teal-600', filter: 'Chung Cư Mini' },
-  { label: 'Phòng Trọ', icon: Home, color: 'from-orange-400 to-amber-500', filter: 'Phòng trọ' },
-  { label: 'KTX', icon: Shield, color: 'from-cyan-500 to-blue-500', filter: 'KTX' },
+  { label: 'Tất Cả',    icon: Home,      filter: '' },
+  { label: 'Chung Cư',  icon: Building2, filter: 'Chung Cư Mini' },
+  { label: 'Phòng Trọ', icon: Home,      filter: 'Phòng trọ' },
+  { label: 'KTX',       icon: Shield,    filter: 'KTX' },
 ];
 
 const ROOM_IMAGES = [
@@ -55,6 +55,7 @@ export default function RoomListPage() {
   const [bookmarks, setBookmarks] = useState(() => JSON.parse(localStorage.getItem('bookmarks') || '[]'));
   const [likes, setLikes] = useState(() => JSON.parse(localStorage.getItem('likes') || '[]'));
   const [view, setView] = useState('grid');
+  const swiperRef = useRef(null);
 
   useEffect(() => { fetchRooms(); }, []);
   useEffect(() => { localStorage.setItem('bookmarks', JSON.stringify(bookmarks)); }, [bookmarks]);
@@ -85,10 +86,10 @@ export default function RoomListPage() {
   const available = rooms.filter(r => r.status === 'Available').length;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors">
+    <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors">
 
-      {/* ─── HERO SWIPER: full-width, no container constraint ─── */}
-      <div className="relative w-full" style={{ height: '480px' }}>
+      {/* ─── HERO SWIPER ─── */}
+      <div className="relative w-full overflow-hidden" style={{ height: '480px' }}>
         <Swiper
           modules={[Autoplay, Pagination, EffectFade]}
           effect="fade"
@@ -96,23 +97,21 @@ export default function RoomListPage() {
           autoplay={{ delay: 4500, disableOnInteraction: false }}
           pagination={{ clickable: true }}
           loop
+          onSwiper={swiper => { swiperRef.current = swiper; }}
           className="w-full h-full"
           style={{ width: '100%', height: '100%' }}
         >
           {HERO_SLIDES.map((slide, i) => (
             <SwiperSlide key={i} style={{ width: '100%', height: '100%' }}>
-              <div className="relative w-full h-full">
-                {/* Background image */}
+              <div className="relative w-full h-full bg-slate-900">
                 <img
                   src={slide.bg}
                   alt={slide.title}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
-                {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-900/85 via-slate-900/50 to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
 
-                {/* Content */}
                 <div className="relative z-10 h-full flex flex-col justify-center px-6 sm:px-12 lg:px-20 max-w-5xl">
                   <motion.div
                     key={i}
@@ -120,22 +119,22 @@ export default function RoomListPage() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.7 }}
                   >
-                    <span className="inline-flex items-center gap-2 text-xs font-black text-primary-300 uppercase tracking-[0.3em] mb-4 bg-primary-900/50 px-4 py-2 rounded-full border border-primary-700/50 backdrop-blur-sm">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
+                    <span className="inline-flex items-center gap-2 text-xs font-black text-white/70 uppercase tracking-[0.25em] mb-4 bg-white/10 px-4 py-2 rounded-full border border-white/20 backdrop-blur-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--rausch)] animate-pulse" />
                       {i + 1}/{HERO_SLIDES.length} · Đức Lương Home
                     </span>
                     <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-3 leading-tight drop-shadow-2xl">
                       {slide.title}
                     </h1>
-                    <p className="text-slate-300 text-base sm:text-lg font-medium mb-8 max-w-xl">
+                    <p className="text-white/75 text-base sm:text-lg font-medium mb-8 max-w-xl">
                       {slide.sub}
                     </p>
                     <div className="flex flex-wrap gap-3">
-                      <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-xl text-sm font-bold border border-white/20">
-                        <Zap className="w-4 h-4 text-emerald-400" /> {available} phòng đang trống
+                      <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm font-semibold border border-white/20">
+                        <Zap className="w-4 h-4" style={{ color: 'var(--rausch)' }} /> {available} phòng đang trống
                       </span>
-                      <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-xl text-sm font-bold border border-white/20">
-                        <TrendingUp className="w-4 h-4 text-primary-400" /> {rooms.length}+ căn hộ
+                      <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm font-semibold border border-white/20">
+                        <TrendingUp className="w-4 h-4" style={{ color: 'var(--rausch)' }} /> {rooms.length}+ căn hộ
                       </span>
                     </div>
                   </motion.div>
@@ -144,41 +143,72 @@ export default function RoomListPage() {
             </SwiperSlide>
           ))}
         </Swiper>
+
+        {/* ─── Custom Nav Buttons ─── */}
+        <button
+          onClick={() => swiperRef.current?.slidePrev()}
+          aria-label="Previous slide"
+          className="group absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20
+            w-11 h-11 rounded-full flex items-center justify-center
+            bg-white/15 hover:bg-white/90
+            border border-white/30 hover:border-white
+            backdrop-blur-md
+            text-white hover:text-[var(--ink-black)]
+            shadow-lg hover:shadow-xl
+            transition-all duration-200 hover:scale-110 active:scale-95"
+        >
+          <ChevronLeft className="w-5 h-5 transition-transform duration-200 group-hover:-translate-x-0.5" strokeWidth={2.5} />
+        </button>
+
+        <button
+          onClick={() => swiperRef.current?.slideNext()}
+          aria-label="Next slide"
+          className="group absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-20
+            w-11 h-11 rounded-full flex items-center justify-center
+            bg-white/15 hover:bg-white/90
+            border border-white/30 hover:border-white
+            backdrop-blur-md
+            text-white hover:text-[var(--ink-black)]
+            shadow-lg hover:shadow-xl
+            transition-all duration-200 hover:scale-110 active:scale-95"
+        >
+          <ChevronRight className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2.5} />
+        </button>
       </div>
 
-      {/* ─── SEARCH BAR: below hero, full-width background ─── */}
-      <div className="bg-white dark:bg-slate-800 shadow-xl border-b border-slate-100 dark:border-slate-700">
-        <div className="max-w-5xl mx-auto px-4 py-5">
+      {/* ─── SEARCH BAR ─── */}
+      <div className="bg-white dark:bg-slate-900 border-b border-[var(--hairline-gray)] dark:border-slate-800 shadow-sm">
+        <div className="max-w-5xl mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-500 pointer-events-none" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stone-gray)] pointer-events-none" />
               <input
                 type="text"
                 placeholder="Tìm theo tên phòng, quận, địa chỉ..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-medium outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all placeholder:text-slate-400"
+                className="form-input pl-11"
               />
             </div>
             <div className="relative">
-              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stone-gray)] pointer-events-none" />
               <select
                 value={priceFilter}
                 onChange={e => setPriceFilter(e.target.value)}
-                className="pl-11 pr-8 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-bold outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 cursor-pointer appearance-none w-full md:w-auto"
+                className="form-input pl-11 pr-8 cursor-pointer appearance-none w-full md:w-44"
               >
                 <option value="all">Tất cả giá</option>
-                <option value="u300">Dưới $300</option>
-                <option value="300-600">$300 – $600</option>
-                <option value="a600">Trên $600</option>
+                <option value="u300">Dưới 3 triệu</option>
+                <option value="300-600">3 – 5 triệu</option>
+                <option value="a600">Trên 5 triệu</option>
               </select>
             </div>
-            <Link
-              to="/rooms"
-              className="bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3.5 rounded-lg transition-all shadow-sm shadow-primary-500/30 flex items-center justify-center gap-2 focus:ring-4 focus:ring-primary-500/30 active:scale-95 whitespace-nowrap"
+            <button
+              onClick={() => {}}
+              className="btn-primary rounded-xl px-7 text-sm whitespace-nowrap"
             >
               <Search className="w-4 h-4" /> Tìm Ngay
-            </Link>
+            </button>
           </div>
         </div>
       </div>
@@ -187,17 +217,13 @@ export default function RoomListPage() {
 
         {/* ─── CATEGORY SWIPER ─── */}
         <div className="mb-10">
-          <Swiper spaceBetween={12} slidesPerView="auto" freeMode className="w-full pb-4">
+          <Swiper spaceBetween={10} slidesPerView="auto" freeMode className="w-full pb-2">
             {CATEGORIES.map(cat => (
               <SwiperSlide key={cat.label} style={{ width: 'auto' }}>
                 <motion.button
-                  whileHover={{ y: -3 }} whileTap={{ scale: 0.95 }}
+                  whileHover={{ y: -2 }} whileTap={{ scale: 0.95 }}
                   onClick={() => setActiveCategory(cat.filter)}
-                  className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl font-bold text-sm transition-all whitespace-nowrap border-2 shadow-sm
-                    ${activeCategory === cat.filter
-                      ? `bg-gradient-to-r ${cat.color} text-white border-transparent shadow-lg`
-                      : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-indigo-300'
-                    }`}
+                  className={`cat-tab ${activeCategory === cat.filter ? 'active' : ''}`}
                 >
                   <cat.icon className="w-4 h-4" /> {cat.label}
                 </motion.button>
@@ -209,15 +235,19 @@ export default function RoomListPage() {
         {/* ─── HEADER BAR ─── */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">
-              {filtered.length} <span className="text-primary-600 dark:text-primary-400">phòng</span> phù hợp
+            <h2 className="text-2xl font-800 text-[var(--ink-black)] dark:text-white">
+              {filtered.length} <span style={{ color: 'var(--rausch)' }}>phòng</span> phù hợp
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-0.5">Cập nhật mới nhất hôm nay</p>
+            <p className="text-[var(--ash-gray)] text-sm font-500 mt-0.5">Cập nhật mới nhất hôm nay</p>
           </div>
           <div className="flex gap-2">
             {['grid', 'list'].map(v => (
               <button key={v} onClick={() => setView(v)}
-                className={`p-2.5 rounded-xl border border-slate-200 transition-all ${view === v ? 'bg-primary-50 border-primary-500 text-primary-600' : 'bg-white dark:bg-slate-800 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-primary-300'}`}
+                className={`p-2.5 rounded-xl border transition-all ${
+                  view === v
+                    ? 'border-[var(--rausch)] text-[var(--rausch)] bg-red-50 dark:bg-red-950/20'
+                    : 'border-[var(--hairline-gray)] dark:border-slate-700 text-[var(--ash-gray)] bg-white dark:bg-slate-900 hover:border-[var(--ash-gray)]'
+                }`}
               >
                 {v === 'grid'
                   ? <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M1 2.5A1.5 1.5 0 012.5 1h3A1.5 1.5 0 017 2.5v3A1.5 1.5 0 015.5 7h-3A1.5 1.5 0 011 5.5v-3zm8 0A1.5 1.5 0 0110.5 1h3A1.5 1.5 0 0115 2.5v3A1.5 1.5 0 0113.5 7h-3A1.5 1.5 0 019 5.5v-3zm-8 8A1.5 1.5 0 012.5 9h3A1.5 1.5 0 017 10.5v3A1.5 1.5 0 015.5 15h-3A1.5 1.5 0 011 13.5v-3zm8 0A1.5 1.5 0 0110.5 9h3A1.5 1.5 0 0115 10.5v3A1.5 1.5 0 0113.5 15h-3A1.5 1.5 0 019 13.5v-3z"/></svg>
@@ -251,7 +281,7 @@ export default function RoomListPage() {
                 </div>
                 <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-3">Không tìm thấy phòng</h3>
                 <p className="text-slate-500 dark:text-slate-400 font-medium max-w-md mx-auto">Thử tìm kiếm với từ khoá khác hoặc thay đổi bộ lọc giá để xem thêm kết quả.</p>
-                <button onClick={() => { setSearchTerm(''); setPriceFilter('all'); setActiveCategory(''); }} className="mt-6 bg-indigo-600 text-white font-bold px-8 py-3 rounded-2xl hover:bg-indigo-700 transition-all shadow-md hover:shadow-indigo-500/30 hover:-translate-y-0.5">
+                <button onClick={() => { setSearchTerm(''); setPriceFilter('all'); setActiveCategory(''); }} className="mt-6 bg-emerald-600 text-white font-bold px-8 py-3 rounded-2xl hover:bg-emerald-700 transition-all shadow-md hover:shadow-emerald-500/30 hover:-translate-y-0.5">
                   Xóa Bộ Lọc
                 </button>
               </motion.div>
@@ -260,65 +290,54 @@ export default function RoomListPage() {
                 {filtered.map((room, i) => (
                   <motion.div key={room.id} custom={i} variants={cardVariants} initial="hidden" animate="visible">
                     <Link to={`/rooms/${room.id}`}
-                      className="group flex flex-col bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-100 shadow-sm dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary-500/10 h-full"
+                      className="group listing-card flex flex-col bg-white dark:bg-slate-900 border border-[var(--hairline-gray)] dark:border-slate-800 hover:border-[var(--stone-gray)] dark:hover:border-slate-600 card-lift h-full"
                     >
                       {/* Image */}
-                      <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
-                        <img src={room.image || getImage(room.id)} alt={room.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                          loading="lazy"
-                        />
+                      <div className="card-image relative">
+                        <img src={room.image || getImage(room.id)} alt={room.name} loading="lazy" />
 
-                        {/* Status Badge */}
+                        {/* Status badge */}
                         <div className="absolute top-3 left-3">
-                          <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase border bg-white/90 backdrop-blur-sm
-                            ${room.status === 'Available'
-                              ? 'text-primary-600 border-primary-100'
-                              : 'text-orange-600 border-orange-100'
-                            }`}>
-                            {room.status === 'Available' ? 'Còn trống' : 'Đã thuê'}
+                          <span className={`badge ${room.status === 'Available' ? 'badge-available' : 'badge-rented'}`}>
+                            {room.status === 'Available' ? '● Còn trống' : '● Đã thuê'}
                           </span>
                         </div>
 
-                        {/* Action buttons */}
-                        <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={e => { e.preventDefault(); toggle(setLikes, likes, room.id); }}
-                            className={`p-2 rounded-full backdrop-blur-md transition-all shadow-md hover:scale-110
-                              ${likes.includes(room.id)
-                                ? 'bg-red-500 text-white'
-                                : 'bg-white/80 text-slate-400 hover:bg-white hover:text-red-500'}`}
-                          >
-                            <Heart className={`w-4 h-4 ${likes.includes(room.id) ? 'fill-white' : ''}`} />
-                          </button>
-                        </div>
+                        {/* Heart */}
+                        <button
+                          onClick={e => { e.preventDefault(); toggle(setLikes, likes, room.id); }}
+                          className={`btn-icon absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity ${
+                            likes.includes(room.id) ? '!bg-[var(--rausch)] !text-white border-[var(--rausch)]' : ''
+                          }`}
+                          style={{ width: 32, height: 32 }}
+                        >
+                          <Heart className={`w-3.5 h-3.5 ${likes.includes(room.id) ? 'fill-white' : ''}`} />
+                        </button>
                       </div>
 
                       {/* Content */}
                       <div className="p-4 flex flex-col flex-grow">
-                        <h3 className="font-semibold text-[1.1rem] text-text-main dark:text-white mb-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-1">{room.name}</h3>
-                        <div className="flex items-center text-text-muted text-xs mb-3 font-medium">
-                          <MapPin className="w-3.5 h-3.5 mr-1.5 flex-shrink-0" />
+                        <h3 className="font-600 text-base text-[var(--ink-black)] dark:text-white mb-1 line-clamp-1 group-hover:text-[var(--rausch)] transition-colors">{room.name}</h3>
+                        <div className="flex items-center text-[var(--ash-gray)] text-xs mb-3 font-500 gap-1">
+                          <MapPin className="w-3 h-3 flex-shrink-0" />
                           <span className="truncate">{room.district || 'Khu vực trung tâm'}</span>
                         </div>
 
-                        {/* Amenities mini tags */}
                         {room.amenities?.length > 0 && (
-                          <div className="flex gap-2 flex-wrap mb-4 mt-auto">
+                          <div className="flex gap-1.5 flex-wrap mb-3">
                             {room.amenities.slice(0, 2).map(a => (
-                              <span key={a} className="text-[10px] font-medium bg-slate-50 dark:bg-slate-700 text-text-muted px-2 py-1 rounded-md">{a}</span>
+                              <span key={a} className="text-[10px] font-500 bg-[var(--soft-cloud)] dark:bg-slate-800 text-[var(--ash-gray)] px-2 py-1 rounded-[4px]">{a}</span>
                             ))}
-                            {room.amenities.length > 2 && <span className="text-[10px] font-medium text-text-muted bg-slate-50 dark:bg-slate-700 px-2 py-1 rounded-md">+{room.amenities.length - 2}</span>}
+                            {room.amenities.length > 2 && <span className="text-[10px] font-500 text-[var(--mute-gray)] bg-[var(--soft-cloud)] dark:bg-slate-800 px-2 py-1 rounded-[4px]">+{room.amenities.length - 2}</span>}
                           </div>
                         )}
 
-                        <div className="flex items-end justify-between pt-3 border-t border-slate-100 dark:border-slate-700">
+                        <div className="flex items-end justify-between pt-3 border-t border-[var(--hairline-gray)] dark:border-slate-800 mt-auto">
                           <div>
-                            <span className="block text-[10px] font-medium text-text-muted mb-0.5 uppercase tracking-wider">Giá thuê</span>
-                            <span className="text-lg font-bold text-primary-600 dark:text-primary-400">{formatPrice(room.price)}<span className="text-xs font-normal text-slate-400 ml-1">/th</span></span>
+                            <span className="block text-[10px] font-600 text-[var(--mute-gray)] mb-0.5 uppercase tracking-wider">Giá thuê</span>
+                            <span className="text-base font-700 text-[var(--ink-black)] dark:text-white">{formatPrice(room.price)}<span className="text-xs font-500 text-[var(--ash-gray)] ml-1">/tháng</span></span>
                           </div>
-                          <button className="h-8 px-4 text-[13px] font-medium rounded-xl border border-primary-500 text-primary-500 hover:bg-primary-50 transition-colors">
-                            Xem ngay
-                          </button>
+                          <span className="text-xs font-600 px-3 py-1.5 rounded-[8px] border border-[var(--hairline-gray)] text-[var(--ash-gray)] hover:border-[var(--rausch)] hover:text-[var(--rausch)] transition-colors">Xem ngay</span>
                         </div>
                       </div>
                     </Link>
@@ -331,11 +350,11 @@ export default function RoomListPage() {
                 {filtered.map((room, i) => (
                   <motion.div key={room.id} custom={i} variants={cardVariants} initial="hidden" animate="visible">
                     <Link to={`/rooms/${room.id}`}
-                      className="group flex bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border-2 border-slate-100 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-0.5"
+                      className="group flex bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border-2 border-slate-100 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-600 transition-all hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-0.5"
                     >
                       <div className="relative w-48 md:w-64 flex-shrink-0 overflow-hidden">
                         <img src={room.image || getImage(room.id)} alt={room.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent group-hover:from-indigo-900/20 transition-all" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent group-hover:from-emerald-900/20 transition-all" />
                         <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-black shadow-md
                           ${room.status === 'Available' ? 'bg-emerald-500 text-white' : 'bg-orange-500 text-white'}`}>
                           {room.status === 'Available' ? 'Trống' : 'Thuê'}
@@ -344,30 +363,30 @@ export default function RoomListPage() {
                       <div className="flex-1 p-6 flex flex-col justify-between">
                         <div>
                           <div className="flex justify-between items-start mb-2">
-                            <h3 className="font-extrabold text-lg text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1 flex-1 mr-4">{room.name}</h3>
+                            <h3 className="font-extrabold text-lg text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-1 flex-1 mr-4">{room.name}</h3>
                             <div className="flex gap-1.5">
                               <button onClick={e => { e.preventDefault(); toggle(setLikes, likes, room.id); }} className={`p-2 rounded-xl transition-all ${likes.includes(room.id) ? 'bg-red-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 hover:text-red-500'}`}>
                                 <Heart className={`w-4 h-4 ${likes.includes(room.id) ? 'fill-white' : ''}`} />
                               </button>
-                              <button onClick={e => { e.preventDefault(); toggle(setBookmarks, bookmarks, room.id); }} className={`p-2 rounded-xl transition-all ${bookmarks.includes(room.id) ? 'bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 hover:text-indigo-500'}`}>
+                              <button onClick={e => { e.preventDefault(); toggle(setBookmarks, bookmarks, room.id); }} className={`p-2 rounded-xl transition-all ${bookmarks.includes(room.id) ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 hover:text-emerald-500'}`}>
                                 <Bookmark className={`w-4 h-4 ${bookmarks.includes(room.id) ? 'fill-white' : ''}`} />
                               </button>
                             </div>
                           </div>
                           <div className="flex items-center text-slate-500 dark:text-slate-400 text-sm mb-3 font-medium">
-                            <MapPin className="w-4 h-4 mr-1.5 text-indigo-500" /> {room.district} {room.address && `· ${room.address}`}
+                            <MapPin className="w-4 h-4 mr-1.5 text-emerald-500" /> {room.district} {room.address && `· ${room.address}`}
                           </div>
                           {room.amenities?.length > 0 && (
                             <div className="flex gap-2 flex-wrap">
                               {room.amenities.slice(0, 5).map(a => (
-                                <span key={a} className="text-xs font-bold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-3 py-1 rounded-xl border border-indigo-100 dark:border-indigo-800">{a}</span>
+                                <span key={a} className="text-xs font-bold bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-xl border border-emerald-100 dark:border-emerald-800">{a}</span>
                               ))}
                             </div>
                           )}
                         </div>
                         <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
                           <div>
-                            <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{formatPrice(room.price)}</span>
+                            <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{formatPrice(room.price)}</span>
                             <span className="text-sm text-slate-400 ml-1">/tháng</span>
                           </div>
                           <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 font-medium">

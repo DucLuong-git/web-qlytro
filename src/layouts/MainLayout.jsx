@@ -1,9 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Moon, Sun, Bell, Menu as MenuIcon, X, Home, Search, User, LayoutDashboard, LogIn } from 'lucide-react';
+import {
+  Moon, Sun, Bell, Menu as MenuIcon, X,
+  Home, Search, User, LayoutDashboard, LogIn,
+  ChevronDown, ExternalLink,
+} from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
 import { useNotificationStore } from '../store/notificationStore';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const MainLayout = () => {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -11,136 +16,237 @@ const MainLayout = () => {
   const { notifications, addNotification, markAllRead } = useNotificationStore();
   const [showNotifications, setShowNotifications] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const notifRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
   const unreadCount = notifications.filter(n => !n.read).length;
+  const isHome = location.pathname === '/';
 
+  /* Scroll detection for navbar style */
   useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 16);
+    window.addEventListener('scroll', handler, { passive: true });
+    return () => window.removeEventListener('scroll', handler);
+  }, []);
+
+  /* Close menu on route change */
+  useEffect(() => { setMobileMenuOpen(false); }, [location.pathname]);
+
+  /* Notification polling */
+  useEffect(() => {
+    const msgs = [
+      'Có phòng mới trống ở khu vực trung tâm!',
+      'Giá phòng số 102 vừa giảm',
+      'Ai đó vừa phản hồi bình luận của bạn',
+    ];
     const interval = setInterval(() => {
-      const messages = [
-        "Có phòng mới trống ở khu vực trung tâm!", 
-        "Giá phòng số 102 vừa giảm", 
-        "Ai đó vừa phản hồi bình luận của bạn"
-      ];
-      const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-      addNotification(randomMsg, 'info');
-    }, 60000); 
+      addNotification(msgs[Math.floor(Math.random() * msgs.length)], 'info');
+    }, 60000);
     return () => clearInterval(interval);
   }, [addNotification]);
 
+  /* Click outside to close notif dropdown */
   useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
+    const handler = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
+  const handleLogout = () => { logout(); navigate('/login'); };
   const handleNotificationClick = () => {
-    setShowNotifications(!showNotifications);
-    if (!showNotifications) markAllRead();
+    setShowNotifications(v => !v);
+    markAllRead();
   };
+
+  /* Nav links */
+  const navLinks = [
+    { to: '/',      label: 'Trang Chủ' },
+    { to: '/rooms', label: 'Tìm Phòng' },
+    ...(isAuthenticated && (user?.role === 'ADMIN' || user?.role === 'STAFF')
+      ? [{ to: '/post-room', label: 'Đăng Phòng' }]
+      : []),
+  ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 pb-16 md:pb-0 overflow-x-hidden w-full">
-      <header className="bg-white/95 dark:bg-slate-900/95 shadow-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 w-full backdrop-blur-md">
-        <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-[var(--ink-black)] dark:text-slate-100 font-sans transition-colors duration-300 pb-16 md:pb-0 overflow-x-hidden w-full">
+
+      {/* ═══════ HEADER ═══════ */}
+      <header
+        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+          scrolled || !isHome
+            ? 'bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-[var(--hairline-gray)] dark:border-slate-800 shadow-sm'
+            : 'bg-transparent border-b border-transparent'
+        }`}
+      >
+        <div className="container mx-auto px-4 sm:px-6 h-[72px] flex items-center justify-between max-w-[1400px]">
+
+          {/* Left: Hamburger + Logo */}
           <div className="flex items-center gap-3">
-            <button 
-              className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            <button
+              className="lg:hidden p-2 -ml-2 rounded-full hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 text-[var(--ash-gray)] transition-colors"
+              onClick={() => setMobileMenuOpen(v => !v)}
+              aria-label="Menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
             </button>
-            <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 font-black text-sm shadow-sm group-hover:scale-105 transition-transform tracking-tight">DL</div>
-              <span className="text-xl font-extrabold tracking-tight hidden sm:block text-slate-800 dark:text-white">Đức Lương <span className="text-primary-500 dark:text-primary-400">Home</span></span>
+            <Link to="/" className="flex items-center gap-2.5 group">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-black text-xs shadow-sm group-hover:scale-105 transition-transform"
+                style={{ background: 'var(--brand-gradient)' }}
+              >
+                DL
+              </div>
+              <span
+                className={`text-lg font-black tracking-tight hidden sm:block transition-colors ${
+                  scrolled || !isHome ? 'text-[var(--ink-black)] dark:text-white' : 'text-white'
+                }`}
+              >
+                Đức Lương <span style={{ color: 'var(--rausch)' }}>Home</span>
+              </span>
             </Link>
           </div>
-          
-          <nav className="hidden lg:flex space-x-8 items-center">
-            <Link to="/" className="text-sm font-semibold text-text-muted hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              Trang Chủ
-            </Link>
-            <Link to="/rooms" className="text-sm font-semibold text-text-muted hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              Tìm Phòng
-            </Link>
-            {isAuthenticated && (user?.role === 'ADMIN' || user?.role === 'STAFF') && (
-              <Link to="/post-room" className="text-sm font-semibold text-text-muted hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                Đăng Phóng Mới
+
+          {/* Center nav */}
+          <nav className="hidden lg:flex items-center gap-8">
+            {navLinks.map(link => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`nav-link text-sm transition-colors ${
+                  location.pathname === link.to ? 'active' : ''
+                } ${
+                  scrolled || !isHome
+                    ? 'text-[var(--ash-gray)] hover:text-[var(--ink-black)] dark:text-slate-400 dark:hover:text-white'
+                    : 'text-white/80 hover:text-white'
+                }`}
+              >
+                {link.label}
               </Link>
-            )}
+            ))}
           </nav>
 
-          <div className="flex items-center gap-2 sm:gap-4">
-            <button onClick={toggleTheme} className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-              {darkMode ? <Sun className="w-4 h-4 text-yellow-500" /> : <Moon className="w-4 h-4 text-slate-600 dark:text-slate-300" />}
+          {/* Right: Actions */}
+          <div className="flex items-center gap-2">
+
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {darkMode
+                ? <Sun className="w-4 h-4 text-yellow-500" />
+                : <Moon className={`w-4 h-4 ${scrolled || !isHome ? 'text-[var(--ash-gray)]' : 'text-white/70'}`} />
+              }
             </button>
 
-            <div className="relative">
-              <button onClick={handleNotificationClick} className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors relative">
-                <Bell className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+            {/* Notification bell */}
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={handleNotificationClick}
+                className="relative p-2 rounded-full hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 transition-colors"
+                aria-label="Notifications"
+              >
+                <Bell className={`w-4 h-4 ${scrolled || !isHome ? 'text-[var(--ash-gray)]' : 'text-white/70'}`} />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+                  <span
+                    className="absolute top-1 right-1 w-2 h-2 rounded-full border border-white"
+                    style={{ background: 'var(--rausch)' }}
+                  />
                 )}
               </button>
-              
-              {showNotifications && (
-                <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50 animate-in slide-in-from-top-2">
-                  <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 flex justify-between items-center">
-                    <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200">Thông báo mới</h3>
-                    <span className="text-xs text-indigo-600 dark:text-indigo-400 font-bold cursor-pointer hover:underline" onClick={markAllRead}>Đánh dấu đã đọc</span>
-                  </div>
-                  <div className="max-h-80 overflow-y-auto">
-                    {notifications.length === 0 ? (
-                      <p className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 text-sm font-medium">Bạn không có thông báo nào!</p>
-                    ) : (
-                      notifications.slice(0, 5).map(n => (
-                        <Link 
-                          to="/dashboard" 
-                          key={n.id} 
+
+              <AnimatePresence>
+                {showNotifications && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-2xl border border-[var(--hairline-gray)] dark:border-slate-700 overflow-hidden z-50"
+                    style={{ boxShadow: 'var(--shadow-2)' }}
+                  >
+                    <div className="px-4 py-3 border-b border-[var(--hairline-gray)] dark:border-slate-700 flex items-center justify-between">
+                      <span className="text-sm font-700 text-[var(--ink-black)] dark:text-white">Thông báo</span>
+                      <button onClick={markAllRead} className="text-xs font-600 hover:underline" style={{ color: 'var(--rausch)' }}>
+                        Đánh dấu đã đọc
+                      </button>
+                    </div>
+                    <div className="max-h-72 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <p className="px-4 py-8 text-center text-sm text-[var(--ash-gray)]">Không có thông báo nào.</p>
+                      ) : notifications.slice(0, 5).map(n => (
+                        <Link
+                          key={n.id}
+                          to="/dashboard"
                           onClick={() => setShowNotifications(false)}
-                          className="block px-4 py-3 border-b border-slate-50 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors"
+                          className="flex flex-col px-4 py-3 border-b border-[var(--soft-cloud)] dark:border-slate-800 hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 transition-colors"
                         >
-                          <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{n.message}</p>
-                          <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 mt-1 block uppercase tracking-widest">{n.time}</span>
+                          <span className="text-sm font-500 text-[var(--ink-black)] dark:text-slate-200">{n.message}</span>
+                          <span className="text-[10px] text-[var(--mute-gray)] mt-0.5 font-500">{n.time}</span>
                         </Link>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
+            {/* Auth */}
             {isAuthenticated ? (
-              <div className="flex items-center gap-3">
-                <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
-                <div className="flex items-center gap-3 ml-1 relative group cursor-pointer">
-                  <div className="hidden md:block text-right">
-                    <div className="text-sm font-semibold text-slate-800 dark:text-white leading-tight">{user?.name}</div>
-                    <div className="text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-widest">{user?.role}</div>
-                  </div>
-                  
-                  {/* Dropdown Profile */}
-                  <div className="absolute right-0 top-full mt-4 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                    <div className="p-2 space-y-1">
-                      <Link to="/dashboard" className="block px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors">Bảng Điều Khiển</Link>
-                      <Link to="/profile" className="block px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors">Hồ Sơ Cá Nhân</Link>
-                      
+              <div className="hidden sm:flex items-center gap-3 ml-1">
+                <div className="h-5 w-px bg-[var(--hairline-gray)] dark:bg-slate-700" />
+                <div className="relative group cursor-pointer">
+                  <button className="flex items-center gap-2 px-3 py-2 rounded-full border border-[var(--hairline-gray)] dark:border-slate-700 hover:border-[var(--ash-gray)] transition-colors bg-white dark:bg-slate-900">
+                    <div
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-800"
+                      style={{ background: 'var(--brand-gradient)' }}
+                    >
+                      {user?.name?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                    <span className="text-sm font-600 text-[var(--ink-black)] dark:text-white max-w-[100px] truncate hidden md:block">
+                      {user?.name}
+                    </span>
+                    <ChevronDown className="w-3.5 h-3.5 text-[var(--ash-gray)] hidden md:block" />
+                  </button>
+
+                  {/* Dropdown */}
+                  <div
+                    className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-slate-900 rounded-2xl border border-[var(--hairline-gray)] dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden"
+                    style={{ boxShadow: 'var(--shadow-2)' }}
+                  >
+                    <div className="px-4 py-3 border-b border-[var(--soft-cloud)] dark:border-slate-800">
+                      <div className="text-sm font-700 text-[var(--ink-black)] dark:text-white">{user?.name}</div>
+                      <div className="text-[10px] font-700 uppercase tracking-wider mt-0.5" style={{ color: 'var(--rausch)' }}>{user?.role}</div>
+                    </div>
+                    <div className="p-1.5 space-y-0.5">
+                      <Link to="/dashboard" className="block px-3 py-2.5 text-sm font-500 text-[var(--ash-gray)] hover:text-[var(--ink-black)] dark:hover:text-white hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 rounded-xl transition-colors">
+                        Bảng Điều Khiển
+                      </Link>
+                      <Link to="/profile" className="block px-3 py-2.5 text-sm font-500 text-[var(--ash-gray)] hover:text-[var(--ink-black)] dark:hover:text-white hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 rounded-xl transition-colors">
+                        Hồ Sơ Cá Nhân
+                      </Link>
                       {(user?.role === 'ADMIN' || user?.role === 'STAFF') && (
                         <>
-                          <div className="h-px bg-slate-100 dark:bg-slate-700 my-1 mx-2"></div>
-                          <Link to="/admin" className="block px-4 py-2.5 text-sm font-semibold text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-xl transition-colors">Quản Trị Hệ Thống</Link>
-                          <Link to="/post-room" className="block px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors">Đăng Phòng Mới</Link>
+                          <div className="h-px bg-[var(--hairline-gray)] dark:bg-slate-700 mx-2 my-1" />
+                          <Link to="/admin" className="block px-3 py-2.5 text-sm font-600 hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 rounded-xl transition-colors" style={{ color: 'var(--rausch)' }}>
+                            Quản Trị Hệ Thống
+                          </Link>
+                          <Link to="/post-room" className="block px-3 py-2.5 text-sm font-500 text-[var(--ash-gray)] hover:text-[var(--ink-black)] dark:hover:text-white hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 rounded-xl transition-colors">
+                            Đăng Phòng Mới
+                          </Link>
                         </>
                       )}
-                      
-                      <div className="h-px bg-slate-100 dark:bg-slate-700 my-1 mx-2"></div>
-                      <button 
+                      <div className="h-px bg-[var(--hairline-gray)] dark:bg-slate-700 mx-2 my-1" />
+                      <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-2.5 text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
+                        className="w-full text-left px-3 py-2.5 text-sm font-600 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors"
                       >
                         Đăng Xuất
                       </button>
@@ -149,173 +255,223 @@ const MainLayout = () => {
                 </div>
               </div>
             ) : (
-               <div className="hidden sm:flex items-center gap-3 ml-2">
-                <Link to="/login" className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              <div className="hidden sm:flex items-center gap-2 ml-2">
+                <Link
+                  to="/login"
+                  className={`text-sm font-600 px-3 py-2 rounded-full transition-colors ${
+                    scrolled || !isHome
+                      ? 'text-[var(--ash-gray)] hover:text-[var(--ink-black)] dark:text-slate-400 dark:hover:text-white'
+                      : 'text-white/80 hover:text-white'
+                  }`}
+                >
                   Đăng Nhập
                 </Link>
-                <Link to="/register" className="text-sm font-semibold bg-primary-500 text-white px-5 py-2.5 rounded-xl hover:bg-primary-600 transition-all shadow-sm active:scale-95">
-                  Đăng Ký Khách Thuê
+                <Link
+                  to="/register"
+                  className="text-sm font-600 text-white px-4 py-2 rounded-full transition-all hover:-translate-y-0.5 active:scale-95"
+                  style={{ background: 'var(--rausch)' }}
+                >
+                  Đăng Ký
                 </Link>
               </div>
             )}
           </div>
         </div>
-        
-        {/* Mobile menu dropdown */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden absolute top-16 left-0 w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in slide-in-from-top-2 duration-200">
-            <div className="px-4 pt-4 pb-6 space-y-2">
-              <Link to="/" className="block px-4 py-3 rounded-xl text-base font-bold bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white transition-colors">
-                Trang Chủ
-              </Link>
-              <Link to="/rooms" className="block px-4 py-3 rounded-xl text-base font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                Tìm Phòng Của Bạn
-              </Link>
-              
-              {isAuthenticated ? (
-                <>
-                  <div className="h-px bg-slate-100 dark:bg-slate-800 my-4 mx-2"></div>
-                  <div className="px-4 mb-2 text-xs font-black text-slate-400 uppercase tracking-wider">Cá Nhân</div>
-                  <Link to="/dashboard" className="block px-4 py-3 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                    Bảng Điều Khiển
+
+        {/* Mobile menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+              className="lg:hidden bg-white dark:bg-slate-950 border-t border-[var(--hairline-gray)] dark:border-slate-800 overflow-hidden"
+            >
+              <div className="px-4 pt-4 pb-6 space-y-1">
+                {navLinks.map(link => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className={`flex items-center px-4 py-3 rounded-xl text-sm font-600 transition-colors ${
+                      location.pathname === link.to
+                        ? 'text-[var(--rausch)] bg-red-50 dark:bg-red-950/30'
+                        : 'text-[var(--ash-gray)] hover:text-[var(--ink-black)] dark:hover:text-white hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    {link.label}
                   </Link>
-                  <Link to="/profile" className="block px-4 py-3 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                    Hồ Sơ Của Tôi
-                  </Link>
-                  
-                  {(user?.role === 'ADMIN' || user?.role === 'STAFF') && (
-                    <>
-                      <div className="h-px bg-slate-100 dark:bg-slate-800 my-4 mx-2"></div>
-                      <div className="px-4 mb-2 text-xs font-black text-slate-400 uppercase tracking-wider">Quản Trị Tổ Chức</div>
-                      <Link to="/admin" className="block px-4 py-3 rounded-xl text-base font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 transition-colors">
-                        Trang Quản Trị Hệ Thống
-                      </Link>
-                      <Link to="/post-room" className="block px-4 py-3 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                        Đăng Phòng Mới
-                      </Link>
-                    </>
-                  )}
-                  
-                  <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                    <div className="px-4 flex items-center justify-between">
+                ))}
+
+                {isAuthenticated ? (
+                  <>
+                    <div className="h-px bg-[var(--hairline-gray)] dark:bg-slate-800 my-3 mx-2" />
+                    <div className="px-4 text-[10px] font-800 text-[var(--mute-gray)] uppercase tracking-widest mb-2">Cá Nhân</div>
+                    <Link to="/dashboard" className="flex items-center px-4 py-3 rounded-xl text-sm font-500 text-[var(--ash-gray)] hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 transition-colors">
+                      Bảng Điều Khiển
+                    </Link>
+                    <Link to="/profile" className="flex items-center px-4 py-3 rounded-xl text-sm font-500 text-[var(--ash-gray)] hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 transition-colors">
+                      Hồ Sơ Của Tôi
+                    </Link>
+                    {(user?.role === 'ADMIN' || user?.role === 'STAFF') && (
+                      <>
+                        <div className="h-px bg-[var(--hairline-gray)] dark:bg-slate-800 my-3 mx-2" />
+                        <Link to="/admin" className="flex items-center px-4 py-3 rounded-xl text-sm font-700 transition-colors" style={{ color: 'var(--rausch)' }}>
+                          Quản Trị Hệ Thống
+                        </Link>
+                        <Link to="/post-room" className="flex items-center px-4 py-3 rounded-xl text-sm font-500 text-[var(--ash-gray)] hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 transition-colors">
+                          Đăng Phòng Mới
+                        </Link>
+                      </>
+                    )}
+                    <div className="mt-4 px-4 flex items-center justify-between">
                       <div>
-                        <div className="text-sm font-bold text-slate-800 dark:text-white">{user?.name}</div>
-                        <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400">{user?.role}</div>
+                        <div className="text-sm font-700 text-[var(--ink-black)] dark:text-white">{user?.name}</div>
+                        <div className="text-[10px] font-700 uppercase tracking-wider" style={{ color: 'var(--rausch)' }}>{user?.role}</div>
                       </div>
-                      <button 
-                        onClick={handleLogout}
-                        className="text-sm font-bold bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-4 py-2 rounded-xl transition-colors"
-                      >
+                      <button onClick={handleLogout} className="text-sm font-700 text-red-500 bg-red-50 dark:bg-red-950/30 px-4 py-2 rounded-xl transition-colors">
                         Đăng Xuất
                       </button>
                     </div>
+                  </>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-[var(--hairline-gray)] dark:border-slate-800">
+                    <Link to="/login" className="flex justify-center items-center py-3 border border-[var(--hairline-gray)] dark:border-slate-700 rounded-xl text-sm font-700 text-[var(--ink-black)] dark:text-white transition-colors hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800">
+                      Đăng Nhập
+                    </Link>
+                    <Link to="/register" className="flex justify-center items-center py-3 rounded-xl text-sm font-700 text-white active:scale-95 transition-all" style={{ background: 'var(--rausch)' }}>
+                      Đăng Ký
+                    </Link>
                   </div>
-                </>
-              ) : (
-                <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-4 px-2">
-                  <Link to="/login" className="flex justify-center items-center py-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                    Đăng Nhập
-                  </Link>
-                  <Link to="/register" className="flex justify-center items-center py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-600/30 active:scale-95 transition-all">
-                    Đăng Ký
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
+      {/* ═══════ MAIN ═══════ */}
       <main className="flex-1 w-full flex flex-col">
         <Outlet />
       </main>
 
-      <footer className="bg-slate-900 pt-16 pb-8 border-t border-slate-800 mt-auto">
+      {/* ═══════ FOOTER ═══════ */}
+      <footer className="bg-[var(--ink-black)] pt-16 pb-10 border-t border-white/5">
         <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+            {/* Brand */}
             <div className="md:col-span-1">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 font-black text-sm shadow-sm tracking-tight">DL</div>
-                <span className="font-extrabold text-white text-xl tracking-tight">Đức Lương <span className="text-primary-500">Home</span></span>
+              <div className="flex items-center gap-2.5 mb-5">
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-xs"
+                  style={{ background: 'var(--brand-gradient)' }}
+                >DL</div>
+                <span className="font-black text-white text-lg tracking-tight">
+                  Đức Lương <span style={{ color: 'var(--rausch)' }}>Home</span>
+                </span>
               </div>
-              <p className="text-sm text-slate-400 font-medium leading-relaxed">
-                Nền tảng tìm kiếm và quản lý phòng trọ số 1 dành cho sinh viên và người lao động trẻ. Uy tín, nhanh chóng, minh bạch.
+              <p className="text-sm text-[var(--ash-gray)] font-500 leading-relaxed max-w-[240px]">
+                Nền tảng tìm kiếm & quản lý phòng trọ số 1 dành cho sinh viên và người lao động trẻ.
               </p>
             </div>
-            
-            <div>
-              <h4 className="text-white font-bold mb-4">Dịch Vụ</h4>
-              <ul className="space-y-3 text-sm text-slate-400 font-medium">
-                <li><Link to="/rooms" className="hover:text-indigo-400 transition-colors">Tìm Phòng Trọ</Link></li>
-                <li><Link to="/rooms?type=Chung Cư Mini" className="hover:text-indigo-400 transition-colors">Chung Cư Mini</Link></li>
-                <li><Link to="/rooms?type=KTX" className="hover:text-indigo-400 transition-colors">Ký Túc Xá Sinh Viên</Link></li>
-                <li><Link to="/post-room" className="hover:text-indigo-400 transition-colors">Đăng Tin Cho Thuê</Link></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-bold mb-4">Hỗ Trợ</h4>
-              <ul className="space-y-3 text-sm text-slate-400 font-medium">
-                <li><Link to="/info/terms" className="hover:text-primary-400 transition-colors">Quy chế hoạt động</Link></li>
-                <li><Link to="/info/faq" className="hover:text-primary-400 transition-colors">Câu hỏi thường gặp</Link></li>
-                <li><Link to="/info/privacy" className="hover:text-primary-400 transition-colors">Chính sách bảo mật</Link></li>
-                <li><Link to="/report" className="hover:text-rose-400 transition-colors">Báo cáo vi phạm</Link></li>
-              </ul>
-            </div>
 
-            <div>
-              <h4 className="text-white font-bold mb-4">Liên Hệ</h4>
-              <ul className="space-y-3 text-sm text-slate-400 font-medium">
-                <li>Email: hotro@fplweb.vn</li>
-                <li>Hotline: 1900 1234 56</li>
-                <li>Địa chỉ: Quận 1, TP Hồ Chí Minh</li>
-              </ul>
-            </div>
+            {/* Links */}
+            {[
+              {
+                title: 'Dịch Vụ',
+                links: [
+                  { label: 'Tìm Phòng Trọ', to: '/rooms' },
+                  { label: 'Chung Cư Mini', to: '/rooms?type=Chung+Cư+Mini' },
+                  { label: 'Ký Túc Xá Sinh Viên', to: '/rooms?type=KTX' },
+                  { label: 'Đăng Tin Cho Thuê', to: '/post-room' },
+                ],
+              },
+              {
+                title: 'Hỗ Trợ',
+                links: [
+                  { label: 'Quy chế hoạt động', to: '/info/terms' },
+                  { label: 'Câu hỏi thường gặp', to: '/info/faq' },
+                  { label: 'Chính sách bảo mật', to: '/info/privacy' },
+                  { label: 'Báo cáo vi phạm', to: '/report' },
+                ],
+              },
+              {
+                title: 'Liên Hệ',
+                items: ['hotro@fplweb.vn', '1900 1234 56', 'Quận 1, TP Hồ Chí Minh'],
+              },
+            ].map((col, i) => (
+              <div key={i}>
+                <h4 className="text-white font-700 text-sm mb-5 tracking-wide">{col.title}</h4>
+                {col.links ? (
+                  <ul className="space-y-3">
+                    {col.links.map(link => (
+                      <li key={link.to}>
+                        <Link
+                          to={link.to}
+                          className="text-sm text-[var(--ash-gray)] font-500 hover:text-white transition-colors"
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <ul className="space-y-3">
+                    {col.items.map((item, j) => (
+                      <li key={j} className="text-sm text-[var(--ash-gray)] font-500">{item}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
           </div>
-          
-          <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
-             <p className="text-xs font-semibold text-slate-500">
-               &copy; {new Date().getFullYear()} Bản quyền thuộc về <span className="text-primary-500 font-bold">Đức Lương Home</span>. Giải Pháp Quản Lý Phòng Trọ Thông Minh.
-             </p>
-             <div className="flex gap-4">
-               <div className="w-8 h-8 rounded-full bg-slate-800 hover:bg-primary-600 transition-colors cursor-pointer border border-slate-700"></div>
-               <div className="w-8 h-8 rounded-full bg-slate-800 hover:bg-primary-600 transition-colors cursor-pointer border border-slate-700"></div>
-               <div className="w-8 h-8 rounded-full bg-slate-800 hover:bg-primary-600 transition-colors cursor-pointer border border-slate-700"></div>
-             </div>
+
+          {/* Bottom bar */}
+          <div className="pt-8 border-t border-white/8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-xs text-[var(--mute-gray)] font-500">
+              © {new Date().getFullYear()} <span style={{ color: 'var(--rausch)' }}>Đức Lương Home</span>. Giải Pháp Quản Lý Phòng Trọ Thông Minh.
+            </p>
+            <div className="flex gap-3">
+              {['FB', 'IG', 'YT'].map(s => (
+                <button
+                  key={s}
+                  className="w-8 h-8 rounded-full bg-white/8 hover:bg-white/16 border border-white/10 text-[var(--ash-gray)] hover:text-white text-[10px] font-700 transition-all hover:-translate-y-0.5 flex items-center justify-center"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </footer>
 
-      {/* ─── MOBILE BOTTOM NAV BAR (Native App Feel) ─── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 z-50 flex items-center justify-around px-2 pb-safe">
-        <Link to="/" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${location.pathname === '/' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`}>
-          <Home className={`w-5 h-5 ${location.pathname === '/' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-          <span className="text-[10px] font-bold">Trang Chủ</span>
-        </Link>
-        <Link to="/rooms" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${location.pathname === '/rooms' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`}>
-          <Search className={`w-5 h-5 ${location.pathname === '/rooms' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-          <span className="text-[10px] font-bold">Tìm Phòng</span>
-        </Link>
-        
-        {isAuthenticated ? (
-          <>
-            <Link to="/dashboard" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${location.pathname === '/dashboard' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`}>
-              <LayoutDashboard className={`w-5 h-5 ${location.pathname === '/dashboard' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-              <span className="text-[10px] font-bold">Quản Lý</span>
+      {/* ═══════ MOBILE BOTTOM NAV ═══════ */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t border-[var(--hairline-gray)] dark:border-slate-800 z-50 flex items-center justify-around px-2">
+        {[
+          { to: '/',          icon: Home,            label: 'Trang Chủ' },
+          { to: '/rooms',     icon: Search,          label: 'Tìm Phòng' },
+          ...(isAuthenticated
+            ? [
+                { to: '/dashboard', icon: LayoutDashboard, label: 'Quản Lý' },
+                { to: '/profile',   icon: User,            label: 'Cá Nhân' },
+              ]
+            : [{ to: '/login', icon: LogIn, label: 'Đăng Nhập' }]
+          ),
+        ].map(item => {
+          const active = location.pathname === item.to;
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="flex flex-col items-center justify-center w-full h-full gap-1 transition-colors"
+              style={{ color: active ? 'var(--rausch)' : 'var(--mute-gray)' }}
+            >
+              <item.icon className={`w-5 h-5 ${active ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+              <span className="text-[10px] font-700">{item.label}</span>
             </Link>
-            <Link to="/profile" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${location.pathname === '/profile' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`}>
-              <User className={`w-5 h-5 ${location.pathname === '/profile' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-              <span className="text-[10px] font-bold">Cá Nhân</span>
-            </Link>
-          </>
-        ) : (
-          <Link to="/login" className="flex flex-col items-center justify-center w-full h-full space-y-1 text-slate-500 dark:text-slate-400">
-            <LogIn className="w-5 h-5 stroke-2" />
-            <span className="text-[10px] font-bold">Đăng Nhập</span>
-          </Link>
-        )}
+          );
+        })}
       </nav>
-
     </div>
   );
 };

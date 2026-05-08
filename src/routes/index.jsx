@@ -20,6 +20,7 @@ import AdminDashboard from '../pages/admin/AdminDashboard';
 import RoomManagement from '../pages/admin/RoomManagement';
 import TenantManagement from '../pages/admin/TenantManagement';
 import LogsPage from '../pages/admin/LogsPage';
+import InvoiceManagementPage from '../pages/admin/InvoiceManagementPage';
 
 export const router = createBrowserRouter([
   {
@@ -106,6 +107,10 @@ export const router = createBrowserRouter([
           {
             path: 'logs',
             element: <LogsPage />,
+          },
+          {
+            path: 'invoices',
+            element: <InvoiceManagementPage />,
           },
         ]
       }

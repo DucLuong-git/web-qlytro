@@ -1,224 +1,477 @@
-import { Link } from 'react-router-dom';
-import { Search, MapPin, Shield, Star, Zap, ChevronRight, Home, Building2, Wallet } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, MapPin, Home, Building2, Shield, Star, Zap, Wallet, ChevronRight, ChevronLeft, ArrowRight } from 'lucide-react';
 import AIChatbot from '../components/AIChatbot';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const HomePage = () => {
-  // Animation Variants
-  const fadeUp = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+/* ── Hero slides ── */
+const HERO_SLIDES = [
+  {
+    bg: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1800&q=85',
+    tag: 'Chung Cư Mini · Nội Thất Đầy Đủ',
+    title: 'Không Gian Sống\nHiện Đại',
+    sub: 'Căn hộ khép kín, view đẹp, bảo an 24/7 — chuẩn sống cho thế hệ trẻ.',
+  },
+  {
+    bg: 'https://images.unsplash.com/photo-1502672260266-1c1b6612ce56?w=1800&q=85',
+    tag: 'Phòng Trọ · Giá Tốt Nhất',
+    title: 'Tìm Phòng Nhanh,\nGiá Minh Bạch',
+    sub: 'Hàng ngàn phòng trống cập nhật mỗi ngày, kết nối trực tiếp không qua trung gian.',
+  },
+  {
+    bg: 'https://images.unsplash.com/photo-1484154218962-a13f7ea07cb1?w=1800&q=85',
+    tag: 'Ký Túc Xá · Sleep Box',
+    title: 'An Toàn &\nTiết Kiệm',
+    sub: 'Hệ thống Sleep Box cao cấp, máy lạnh 24h, phục vụ ăn uống — dành cho sinh viên FPT.',
+  },
+];
+
+/* ── Category filters ── */
+const CATEGORIES = [
+  { label: 'Tất Cả',    icon: Home,      value: '' },
+  { label: 'Chung Cư',  icon: Building2, value: 'Chung Cư Mini' },
+  { label: 'Phòng Trọ', icon: Home,      value: 'Phòng trọ' },
+  { label: 'KTX',       icon: Shield,    value: 'KTX' },
+];
+
+/* ── Features ── */
+const FEATURES = [
+  { icon: Shield, label: 'Bảo Đảm An Toàn',    desc: '100% tài sản và thông tin đã được thẩm duyệt kỹ lưỡng.' },
+  { icon: Zap,    label: 'Cập Nhật Tức Thì',    desc: 'Dữ liệu làm mới liên tục với vô vàn lựa chọn phòng trống.' },
+  { icon: Star,   label: 'AI Hỗ Trợ Tìm Kiếm', desc: 'Chatbot AI cá nhân hoá gợi ý phòng theo sở thích của bạn.' },
+  { icon: Wallet, label: 'Thanh Toán Ngân Hàng', desc: 'Ký hợp đồng & thanh toán VNPay Online an toàn, nhanh chóng.' },
+];
+
+/* ── Animation variants ── */
+const fadeUp = {
+  hidden:  { opacity: 0, y: 36 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.4, 0, 0.2, 1] } },
+};
+const stagger = {
+  hidden:  { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
+};
+
+/* ══════════════════════════════════════════════ */
+export default function HomePage() {
+  const [slide, setSlide]       = useState(0);
+  const [direction, setDir]     = useState(1);
+  const [searchTerm, setSearch] = useState('');
+  const [roomType, setRoomType] = useState('');
+  const [priceRange, setPrice]  = useState('');
+  const timerRef = useRef(null);
+  const navigate  = useNavigate();
+
+  /* Auto-advance hero carousel */
+  const startTimer = () => {
+    timerRef.current = setInterval(() => {
+      setDir(1);
+      setSlide(s => (s + 1) % HERO_SLIDES.length);
+    }, 5500);
   };
-  const staggerContainer = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
+  useEffect(() => { startTimer(); return () => clearInterval(timerRef.current); }, []);
+
+  const goTo = (idx) => {
+    clearInterval(timerRef.current);
+    setDir(idx > slide ? 1 : -1);
+    setSlide(idx);
+    startTimer();
+  };
+  const prev = () => goTo((slide - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+  const next = () => goTo((slide + 1) % HERO_SLIDES.length);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (searchTerm) params.set('q', searchTerm);
+    if (roomType)   params.set('type', roomType);
+    if (priceRange) params.set('price', priceRange);
+    navigate(`/rooms?${params.toString()}`);
+  };
+
+  /* Slide variants */
+  const slideVariants = {
+    enter:  (d) => ({ opacity: 0, x: d > 0 ? 80 : -80 }),
+    center: { opacity: 1, x: 0, transition: { duration: 0.65, ease: [0.4, 0, 0.2, 1] } },
+    exit:   (d) => ({ opacity: 0, x: d > 0 ? -80 : 80, transition: { duration: 0.45 } }),
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300 overflow-x-hidden">
-      {/* Hero Section */}
-      <section className="relative pt-20 pb-32 flex items-center justify-center min-h-[600px] lg:min-h-[700px]">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
-            alt="Hero Background" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-slate-900/60 dark:bg-slate-900/80 backdrop-blur-[2px]"></div>
+    <div className="flex flex-col min-h-screen bg-white dark:bg-slate-950 overflow-x-hidden">
+
+      {/* ═══════════════════════ HERO CAROUSEL ═══════════════════════ */}
+      <section className="relative w-full overflow-hidden" style={{ height: 'clamp(560px, 80vh, 760px)' }}>
+        {/* Slides */}
+        <AnimatePresence initial={false} custom={direction} mode="sync">
+          <motion.div
+            key={slide}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="absolute inset-0"
+          >
+            <img
+              src={HERO_SLIDES[slide].bg}
+              alt={HERO_SLIDES[slide].title}
+              className="w-full h-full object-cover"
+              loading={slide === 0 ? 'eager' : 'lazy'}
+            />
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-900/50 to-slate-900/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Hero content */}
+        <div className="relative z-10 h-full flex flex-col justify-center px-5 sm:px-10 lg:px-20 max-w-6xl">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`content-${slide}`}
+              initial={{ opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0, transition: { duration: 0.6, delay: 0.15 } }}
+              exit={{ opacity: 0, y: -16, transition: { duration: 0.3 } }}
+              className="max-w-2xl"
+            >
+              {/* Slide tag */}
+              <span className="inline-flex items-center gap-2 text-[11px] font-700 text-white/90 uppercase tracking-[0.25em] mb-5 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#ff385c] animate-pulse" />
+                {HERO_SLIDES[slide].tag}
+              </span>
+
+              {/* Headline */}
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.1] mb-5 tracking-tight drop-shadow-xl whitespace-pre-line">
+                {HERO_SLIDES[slide].title}
+              </h1>
+
+              {/* Sub */}
+              <p className="text-base sm:text-lg text-white/80 font-medium mb-8 max-w-xl leading-relaxed">
+                {HERO_SLIDES[slide].sub}
+              </p>
+
+              {/* Quick CTA */}
+              <Link
+                to="/rooms"
+                className="btn-primary inline-flex gap-2 text-sm"
+                style={{ borderRadius: 'var(--radius-pill)' }}
+              >
+                Khám Phá Ngay <ArrowRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        <motion.div 
-          initial="hidden"
-          animate="visible"
-          variants={staggerContainer}
-          className="container relative z-10 mx-auto px-4 sm:px-6 w-full max-w-5xl text-center"
+        {/* Arrow controls */}
+        <button
+          onClick={prev}
+          className="btn-icon absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-20"
+          aria-label="Previous slide"
         >
-          <motion.h1 variants={fadeUp} className="text-4xl md:text-5xl lg:text-7xl font-extrabold text-white tracking-tight mb-6 drop-shadow-xl">
-            Tìm Phòng Trọ Nhanh Chóng, <br className="hidden md:block" /> <span className="text-indigo-400">Không Lo Về Giá</span>
-          </motion.h1>
-          <motion.p variants={fadeUp} className="text-lg md:text-xl text-slate-200 mb-10 max-w-2xl mx-auto drop-shadow-md">
-            Nền tảng quản lý & cho thuê phòng trọ uy tín, kết nối trực tiếp chủ nhà và người thuê với hàng ngàn phòng trống được cập nhật mỗi ngày.
-          </motion.p>
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <button
+          onClick={next}
+          className="btn-icon absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-20"
+          aria-label="Next slide"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
 
-          {/* Search Box */}
-          <motion.div variants={fadeUp} className="bg-white dark:bg-slate-800 p-3 md:p-4 rounded-3xl shadow-2xl max-w-4xl mx-auto flex flex-col md:flex-row gap-3">
-            <div className="flex-1 relative flex items-center bg-slate-50 dark:bg-slate-900/50 rounded-2xl px-4 py-3 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 hover:shadow-inner transition-all">
-              <MapPin className="w-6 h-6 text-indigo-500 flex-shrink-0" />
-              <input 
-                type="text" 
-                placeholder="Nhập tên đường, quận, huyện..." 
-                className="w-full bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white font-medium placeholder-slate-400 ml-3 outline-none"
+        {/* Dot indicators */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+          {HERO_SLIDES.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goTo(i)}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i === slide ? 'w-6 bg-white' : 'w-1.5 bg-white/50 hover:bg-white/75'
+              }`}
+              aria-label={`Slide ${i + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Slide counter */}
+        <div className="absolute bottom-6 right-6 sm:right-10 z-20 text-white/60 text-xs font-semibold tracking-widest">
+          {String(slide + 1).padStart(2, '0')} / {String(HERO_SLIDES.length).padStart(2, '0')}
+        </div>
+      </section>
+
+      {/* ═══════════════════════ SEARCH BAR ═══════════════════════ */}
+      <section className="relative z-30 -mt-10 px-4 sm:px-6 lg:px-10 pb-4">
+        <motion.form
+          onSubmit={handleSearch}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="max-w-5xl mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-[var(--hairline-gray)] dark:border-slate-700 flex flex-col md:flex-row gap-0 overflow-hidden"
+        >
+          {/* Location */}
+          <div className="flex items-center gap-3 flex-1 px-5 py-4 border-b md:border-b-0 md:border-r border-[var(--hairline-gray)] dark:border-slate-700 hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-700/50 transition-colors">
+            <MapPin className="w-5 h-5 text-[var(--rausch)] flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <span className="block text-[11px] font-600 text-[var(--ash-gray)] uppercase tracking-wider mb-0.5">Địa điểm</span>
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Tên đường, quận, huyện..."
+                className="w-full bg-transparent border-none text-sm font-500 text-[var(--ink-black)] dark:text-white placeholder:text-[var(--stone-gray)] focus:outline-none"
               />
             </div>
-            <div className="flex-1 relative flex items-center bg-slate-50 dark:bg-slate-900/50 rounded-2xl px-4 py-3 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 transition-all">
-              <Home className="w-6 h-6 text-emerald-500 flex-shrink-0" />
-              <select className="w-full bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white font-medium ml-3 outline-none cursor-pointer">
-                <option value="">Loại phòng (Tất cả)</option>
-                <option value="tro">Phòng trọ</option>
-                <option value="chungcu">Chung cư mini</option>
-                <option value="ktx">Ký túc xá (Sleep Box)</option>
+          </div>
+
+          {/* Room type */}
+          <div className="flex items-center gap-3 flex-1 px-5 py-4 border-b md:border-b-0 md:border-r border-[var(--hairline-gray)] dark:border-slate-700 hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-700/50 transition-colors">
+            <Home className="w-5 h-5 text-[var(--ash-gray)] flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <span className="block text-[11px] font-600 text-[var(--ash-gray)] uppercase tracking-wider mb-0.5">Loại phòng</span>
+              <select
+                value={roomType}
+                onChange={e => setRoomType(e.target.value)}
+                className="w-full bg-transparent border-none text-sm font-500 text-[var(--ink-black)] dark:text-white focus:outline-none cursor-pointer"
+              >
+                <option value="">Tất cả loại phòng</option>
+                <option value="Phòng trọ">Phòng Trọ</option>
+                <option value="Chung Cư Mini">Chung Cư Mini</option>
+                <option value="KTX">Ký Túc Xá (Sleep Box)</option>
               </select>
             </div>
-             <div className="flex-1 relative flex items-center bg-slate-50 dark:bg-slate-900/50 rounded-2xl px-4 py-3 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 transition-all">
-              <Wallet className="w-6 h-6 text-orange-500 flex-shrink-0" />
-              <select className="w-full bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white font-medium ml-3 outline-none cursor-pointer">
-                <option value="">Mức giá</option>
+          </div>
+
+          {/* Price */}
+          <div className="flex items-center gap-3 flex-1 px-5 py-4 border-b md:border-b-0 md:border-r border-[var(--hairline-gray)] dark:border-slate-700 hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-700/50 transition-colors">
+            <Wallet className="w-5 h-5 text-[var(--ash-gray)] flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <span className="block text-[11px] font-600 text-[var(--ash-gray)] uppercase tracking-wider mb-0.5">Mức giá</span>
+              <select
+                value={priceRange}
+                onChange={e => setPrice(e.target.value)}
+                className="w-full bg-transparent border-none text-sm font-500 text-[var(--ink-black)] dark:text-white focus:outline-none cursor-pointer"
+              >
+                <option value="">Tất cả mức giá</option>
                 <option value="u3m">Dưới 3 triệu</option>
-                <option value="3-5m">3 - 5 triệu</option>
+                <option value="3-5m">3 – 5 triệu</option>
                 <option value="a5m">Trên 5 triệu</option>
               </select>
             </div>
-            <Link 
-              to="/rooms" 
-              className="bg-primary-500 hover:bg-primary-600 text-white font-bold py-4 px-8 rounded-2xl md:rounded-2xl transition-all shadow-lg hover:shadow-primary-500/40 flex items-center justify-center whitespace-nowrap active:scale-95"
-            >
-              <Search className="w-5 h-5 md:mr-2" />
-              <span className="hidden md:inline">Tìm kiếm</span>
-            </Link>
-          </motion.div>
-
-          <motion.div variants={fadeUp} className="mt-8 flex flex-wrap justify-center gap-4 text-sm font-medium text-slate-200">
-            <span className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-sm cursor-default hover:bg-white/20 transition-colors">🔥 Gần đại học FPT</span>
-            <span className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-sm cursor-default hover:bg-white/20 transition-colors">✨ Phòng mới chốt</span>
-            <span className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-sm cursor-default hover:bg-white/20 transition-colors">⚡️ Chung cư Quận 1</span>
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* Featured Categories */}
-      <section className="py-16 md:py-24 bg-white dark:bg-slate-800 -mt-10 rounded-t-[40px] relative z-20 border-t border-slate-100 dark:border-slate-700 overflow-hidden">
-        <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-4">Danh Mục Nổi Bật</h2>
-            <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg">Chọn ngay cho mình một không gian sống phù hợp với túi tiền và phong cách sống.</p>
-          </motion.div>
-
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            variants={staggerContainer}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-          >
-            <motion.div variants={fadeUp} whileHover={{ y: -10 }} transition={{ type: "spring", stiffness: 300 }}>
-               <Link to="/rooms" className="block outline-none bg-slate-50 dark:bg-slate-900/50 rounded-[2.5rem] p-10 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 group cursor-pointer text-center relative z-20 transition-all h-full">
-                 <div className="w-24 h-24 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 group-hover:-translate-y-4 group-hover:scale-110 transition-transform duration-300">
-                   <Home className="w-12 h-12" />
-                 </div>
-                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Phòng Trọ Tiêu Chuẩn</h3>
-                 <p className="text-slate-600 dark:text-slate-400 mb-8 font-medium">Phòng trọ giá rẻ, tiết kiệm chi phí, phù hợp với tập thể sinh viên và người lao động xa quê.</p>
-                 <span className="text-indigo-600 dark:text-indigo-400 font-bold inline-flex items-center group-hover:translate-x-2 transition-transform uppercase tracking-widest text-sm">
-                   Xem Các Sản Phẩm <ChevronRight className="w-5 h-5 ml-1" />
-                 </span>
-               </Link>
-            </motion.div>
-            
-            <motion.div variants={fadeUp} whileHover={{ y: -10 }} transition={{ type: "spring", stiffness: 300 }}>
-               <Link to="/rooms" className="block outline-none bg-slate-50 dark:bg-slate-900/50 rounded-[2.5rem] p-10 border-[3px] border-emerald-500/20 dark:border-emerald-500/30 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/20 group cursor-pointer text-center relative overflow-hidden z-20 transition-all h-full">
-                 <div className="absolute top-6 right-6 bg-emerald-500 text-white text-xs font-bold px-4 py-1.5 rounded-full animate-bounce shadow-md">HOT</div>
-                 <div className="w-24 h-24 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 group-hover:-translate-y-4 group-hover:scale-110 transition-transform duration-300">
-                   <Building2 className="w-12 h-12" />
-                 </div>
-                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Chung Cư Mini</h3>
-                 <p className="text-slate-600 dark:text-slate-400 mb-8 font-medium">Căn hộ khép kín đầy đủ nội thất, tự do giờ giấc, có lực lượng bảo an giữ camera 24/7.</p>
-                 <span className="text-emerald-600 dark:text-emerald-400 font-bold inline-flex items-center group-hover:translate-x-2 transition-transform uppercase tracking-widest text-sm">
-                   Dành Cho Tuổi Trẻ <ChevronRight className="w-5 h-5 ml-1" />
-                 </span>
-               </Link>
-            </motion.div>
-
-             <motion.div variants={fadeUp} whileHover={{ y: -10 }} transition={{ type: "spring", stiffness: 300 }}>
-               <Link to="/rooms" className="block outline-none bg-slate-50 dark:bg-slate-900/50 rounded-[2.5rem] p-10 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-2xl hover:shadow-orange-500/10 group cursor-pointer text-center relative z-20 transition-all h-full">
-                 <div className="w-24 h-24 bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 group-hover:-translate-y-4 group-hover:scale-110 transition-transform duration-300">
-                   <Shield className="w-12 h-12" />
-                 </div>
-                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Phòng Ký Túc Xá</h3>
-                 <p className="text-slate-600 dark:text-slate-400 mb-8 font-medium">Hệ thống giường tầng rèm kéo cao cấp (Sleep box), phòng máy lạnh suốt 24h & Có phục vụ ăn uống.</p>
-                 <span className="text-orange-600 dark:text-orange-400 font-bold inline-flex items-center group-hover:translate-x-2 transition-transform uppercase tracking-widest text-sm">
-                   Trải Nghiệm An Tâm <ChevronRight className="w-5 h-5 ml-1" />
-                 </span>
-               </Link>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Why Choose Us */}
-      <section className="py-20 md:py-32 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 overflow-hidden">
-        <motion.div 
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="container mx-auto px-4 sm:px-6 max-w-7xl text-center"
-        >
-           <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-20 tracking-tight">Vì Sao Chọn FPL Web?</h2>
-           <motion.div 
-             initial="hidden"
-             whileInView="visible"
-             viewport={{ once: true, margin: "-100px" }}
-             variants={staggerContainer}
-             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12"
-           >
-              {[
-                { icon: Shield, title: 'Bảo Đảm An Toàn', desc: '100% tài sản và thông tin đã được thẩm duyệt.' },
-                { icon: Zap, title: 'Cập Nhật Nhanh Chóng', desc: 'Dữ liệu được làm mới liên tục với vô vàn lựa chọn.' },
-                { icon: Star, title: 'Tìm Kiếm Dễ Dàng', desc: 'Công cụ AI hỗ trợ bộ lọc để cá nhân hoá sở thích.' },
-                { icon: Wallet, title: 'Thanh Toán Ngân Hàng', desc: 'Ký hợp đồng và thanh toán VNPay Online trực tiếp.' }
-              ].map((ft, idx) => (
-                <motion.div key={idx} variants={fadeUp} className="flex flex-col items-center group">
-                   <div className="w-20 h-20 rounded-3xl bg-white dark:bg-slate-800 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] group-hover:shadow-[0_10px_40px_-10px_rgba(16,185,129,0.5)] flex items-center justify-center text-primary-600 dark:text-primary-400 mb-8 border border-slate-100 dark:border-slate-700 transition-all duration-300 group-hover:-translate-y-2 group-hover:bg-primary-600 group-hover:text-white group-hover:scale-110">
-                      <ft.icon className="w-10 h-10" />
-                   </div>
-                   <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{ft.title}</h4>
-                   <p className="text-slate-500 dark:text-slate-400 max-w-[220px] font-medium leading-relaxed">{ft.desc}</p>
-                </motion.div>
-              ))}
-           </motion.div>
-        </motion.div>
-      </section>
-
-      {/* Footer Call to Action */}
-      <motion.section 
-        initial={{ opacity: 0, scale: 0.8 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
-        className="py-24 bg-gradient-to-br from-primary-500 to-primary-700 text-white text-center rounded-[3rem] mx-4 sm:mx-10 mb-10 shadow-2xl overflow-hidden relative border-4 border-primary-400/20"
-      >
-        <div className="absolute inset-0 z-0">
-          <motion.div 
-            animate={{ rotate: 360, scale: [1, 1.1, 1] }} 
-            transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
-            className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3"
-          />
-          <motion.div 
-             animate={{ rotate: -360, scale: [1, 1.2, 1] }} 
-             transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
-             className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-black/10 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/3"
-          />
-        </div>
-        <div className="relative z-10 container mx-auto px-4 max-w-4xl">
-          <h2 className="text-4xl md:text-6xl font-black mb-8 tracking-tight drop-shadow-lg">Bạn Có Nhà Trống Cho Thuê?</h2>
-          <p className="text-primary-100 text-xl font-medium mb-12 opacity-90 drop-shadow-sm leading-relaxed max-w-3xl mx-auto">Vươn ra biển lớn. Bắt đầu phân phối sản phẩm lưu trú của mình đến tay hàng triệu sinh viên trên toàn quốc với App Quản Lý Thu Tiền tự động miễn phí!</p>
-          <div className="flex justify-center">
-            <Link to="/post-room" className="inline-flex py-5 px-10 rounded-full bg-white text-primary-700 font-extrabold text-lg hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] hover:scale-105 transition-all shadow-xl active:scale-95 leading-none items-center">
-               <Building2 className="w-6 h-6 mr-3" /> Đăng Ký Quản Trị Tổ Chức FPL Ngay
-            </Link>
           </div>
-        </div>
-      </motion.section>
 
-      {/* Floating AI Chatbot cho User */}
+          {/* Submit */}
+          <button
+            type="submit"
+            className="btn-primary m-3 rounded-xl px-8 shrink-0 text-sm"
+          >
+            <Search className="w-4 h-4" />
+            <span className="hidden sm:inline">Tìm Kiếm</span>
+          </button>
+        </motion.form>
+
+        {/* Quick tags */}
+        <div className="max-w-5xl mx-auto mt-3 flex flex-wrap gap-2 px-1">
+          {['🔥 Gần FPT', '✨ Mới đăng', '⚡ Quận 1', '🏠 Còn trống'].map(tag => (
+            <button
+              key={tag}
+              onClick={() => navigate('/rooms')}
+              className="text-xs font-600 text-[var(--ash-gray)] dark:text-slate-400 bg-[var(--soft-cloud)] dark:bg-slate-800 px-3 py-1.5 rounded-full border border-[var(--hairline-gray)] dark:border-slate-700 hover:border-[var(--rausch)] hover:text-[var(--rausch)] transition-all"
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════ CATEGORIES ═══════════════════════ */}
+      <section className="py-20 px-4 sm:px-6 lg:px-10 bg-white dark:bg-slate-950">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }}
+            variants={stagger}
+            className="text-center mb-14"
+          >
+            <motion.p variants={fadeUp} className="text-xs font-700 text-[var(--rausch)] uppercase tracking-[0.22em] mb-3">
+              Danh Mục
+            </motion.p>
+            <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-black text-[var(--ink-black)] dark:text-white tracking-tight mb-4">
+              Tìm Không Gian Phù Hợp
+            </motion.h2>
+            <motion.p variants={fadeUp} className="text-[var(--ash-gray)] max-w-lg mx-auto font-500 text-base leading-relaxed">
+              Chọn ngay loại phòng phù hợp với phong cách sống và ngân sách của bạn.
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }}
+            variants={stagger}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          >
+            {[
+              {
+                icon: Home,
+                label: 'Phòng Trọ Tiêu Chuẩn',
+                desc: 'Phòng trọ giá tốt, phù hợp sinh viên và người lao động trẻ xa nhà.',
+                cta: 'Xem phòng trọ',
+                accent: '#ff385c',
+                bg: 'from-rose-50 to-white',
+                darkBg: 'dark:from-rose-950/30 dark:to-slate-900',
+                filter: 'Phòng trọ',
+              },
+              {
+                icon: Building2,
+                label: 'Chung Cư Mini',
+                desc: 'Căn hộ khép kín đầy đủ nội thất, tự do giờ giấc, bảo an camera 24/7.',
+                cta: 'Xem chung cư',
+                accent: '#ff385c',
+                bg: 'from-pink-50 to-white',
+                darkBg: 'dark:from-pink-950/20 dark:to-slate-900',
+                filter: 'Chung Cư Mini',
+                hot: true,
+              },
+              {
+                icon: Shield,
+                label: 'Ký Túc Xá Sleep Box',
+                desc: 'Giường tầng rèm kéo cao cấp, máy lạnh 24h, phục vụ ăn uống tận nơi.',
+                cta: 'Xem KTX',
+                accent: '#ff385c',
+                bg: 'from-orange-50 to-white',
+                darkBg: 'dark:from-orange-950/20 dark:to-slate-900',
+                filter: 'KTX',
+              },
+            ].map((cat, i) => (
+              <motion.div key={i} variants={fadeUp} whileHover={{ y: -8 }} transition={{ type: 'spring', stiffness: 300 }}>
+                <Link
+                  to={`/rooms?type=${encodeURIComponent(cat.filter)}`}
+                  className={`group flex flex-col h-full bg-gradient-to-br ${cat.bg} ${cat.darkBg} rounded-[22px] p-8 border border-[var(--hairline-gray)] dark:border-slate-800 hover:border-[var(--rausch)]/40 hover:shadow-2xl hover:shadow-[var(--rausch)]/8 transition-all duration-300 relative overflow-hidden`}
+                >
+                  {cat.hot && (
+                    <span className="absolute top-5 right-5 text-[10px] font-800 text-white bg-[var(--rausch)] px-2.5 py-1 rounded-full tracking-wider">
+                      HOT
+                    </span>
+                  )}
+                  {/* Icon */}
+                  <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg"
+                    style={{ background: `${cat.accent}15`, color: cat.accent }}
+                  >
+                    <cat.icon className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-xl font-800 text-[var(--ink-black)] dark:text-white mb-3">{cat.label}</h3>
+                  <p className="text-sm text-[var(--ash-gray)] font-500 leading-relaxed mb-6 flex-1">{cat.desc}</p>
+                  <span
+                    className="inline-flex items-center gap-1.5 text-sm font-700 group-hover:gap-3 transition-all"
+                    style={{ color: cat.accent }}
+                  >
+                    {cat.cta} <ChevronRight className="w-4 h-4" />
+                  </span>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════ WHY CHOOSE US ═══════════════════════ */}
+      <section className="py-20 bg-[var(--soft-cloud)] dark:bg-slate-900 border-y border-[var(--hairline-gray)] dark:border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }}
+            variants={stagger}
+            className="text-center mb-14"
+          >
+            <motion.p variants={fadeUp} className="text-xs font-700 text-[var(--rausch)] uppercase tracking-[0.22em] mb-3">
+              Vì Sao Chọn Chúng Tôi
+            </motion.p>
+            <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-black text-[var(--ink-black)] dark:text-white tracking-tight">
+              Trải Nghiệm Khác Biệt
+            </motion.h2>
+          </motion.div>
+
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }}
+            variants={stagger}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+          >
+            {FEATURES.map((ft, i) => (
+              <motion.div
+                key={i} variants={fadeUp}
+                className="feature-icon-wrap flex flex-col items-center text-center group"
+              >
+                <div className="feature-icon mb-5">
+                  <ft.icon className="w-6 h-6 text-[var(--ash-gray)] group-hover:text-white transition-colors" />
+                </div>
+                <h4 className="text-base font-700 text-[var(--ink-black)] dark:text-white mb-2">{ft.label}</h4>
+                <p className="text-sm text-[var(--ash-gray)] font-500 leading-relaxed max-w-[220px]">{ft.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════ STATS BAND ═══════════════════════ */}
+      <section className="py-12 bg-white dark:bg-slate-950 border-b border-[var(--hairline-gray)] dark:border-slate-800">
+        <div className="max-w-5xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          {[
+            { num: '2,000+', lbl: 'Phòng Đã Đăng' },
+            { num: '98%',    lbl: 'Hài Lòng' },
+            { num: '500+',   lbl: 'Chủ Nhà Uy Tín' },
+            { num: '24/7',   lbl: 'Hỗ Trợ Online' },
+          ].map((s, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }}
+            >
+              <div className="text-3xl font-900 text-[var(--ink-black)] dark:text-white mb-1 tracking-tight">{s.num}</div>
+              <div className="text-sm text-[var(--ash-gray)] font-500">{s.lbl}</div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════ CTA BANNER ═══════════════════════ */}
+      <section className="py-20 px-4 sm:px-6 lg:px-10 bg-white dark:bg-slate-950">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+            className="relative rounded-[28px] overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, #ff385c 0%, #e00b41 50%, #92174d 100%)' }}
+          >
+            {/* Background decoration */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute -top-20 -right-20 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
+              <div className="absolute -bottom-16 -left-16 w-60 h-60 bg-black/10 rounded-full blur-3xl" />
+            </div>
+
+            <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 p-10 md:p-14">
+              <div className="flex-1 text-center md:text-left">
+                <p className="text-white/70 text-xs font-700 uppercase tracking-[0.2em] mb-3">Cho Chủ Nhà</p>
+                <h2 className="text-3xl md:text-4xl font-900 text-white mb-4 tracking-tight leading-tight">
+                  Bạn Có Nhà Trống<br className="hidden md:block" /> Cho Thuê?
+                </h2>
+                <p className="text-white/80 font-500 max-w-md leading-relaxed text-sm md:text-base">
+                  Đăng tin miễn phí, quản lý thu tiền tự động — kết nối với hàng ngàn sinh viên đang tìm phòng mỗi ngày.
+                </p>
+              </div>
+              <div className="shrink-0">
+                <Link
+                  to="/post-room"
+                  className="inline-flex items-center gap-2 bg-white text-[var(--rausch)] font-800 px-8 py-4 rounded-full hover:shadow-2xl hover:shadow-white/20 hover:scale-105 transition-all active:scale-95 text-sm"
+                >
+                  <Building2 className="w-5 h-5" />
+                  Đăng Phòng Ngay
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* AI Chatbot */}
       <AIChatbot type="user" />
     </div>
   );
-};
-
-export default HomePage;
+}

@@ -5,15 +5,12 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { CreditCard, FileText, Download, CheckCircle, Clock, Zap, Droplet, User, BellRing, Mail, Check, AlertCircle } from 'lucide-react';
 import { useNotificationStore } from '../store/notificationStore';
-import { fetchConfig, buildVietQrUrl } from '../services/invoiceApi';
+import { fetchConfig, buildVietQrUrl, fetchInvoices } from '../services/invoiceApi';
 
 const DashboardPage = () => {
   const user = useAuthStore((state) => state.user);
   const { addNotification } = useNotificationStore();
-  const [invoices, setInvoices] = useState([
-    { id: 'INV-001', roomAmount: 40000, electricity: 5000, water: 2000, service: 3000, date: '2026-03-01', status: 'Đã thanh toán' },
-    { id: 'INV-002', roomAmount: 40000, electricity: 6000, water: 2500, service: 3000, date: '2026-04-01', status: 'Chờ thanh toán' }
-  ]);
+  const [invoices, setInvoices] = useState([]);
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -40,25 +37,25 @@ const DashboardPage = () => {
 
   useEffect(() => {
     if (user?.role === 'TENANT') {
-      const interval = setInterval(() => {
-        const newInv = { 
-          id: `INV-00${invoices.length + 1}`, 
-          roomAmount: 40000,
-          electricity: Math.floor(Math.random() * 3000) + 4000,
-          water: Math.floor(Math.random() * 1000) + 1500,
-          service: 3000,
-          date: new Date().toISOString().split('T')[0], 
-          status: 'Chờ thanh toán' 
-        };
-        setInvoices(prev => [newInv, ...prev]);
-        
-        // Kích hoạt chuông thông báo Realtime lên System Layout
-        // Kích hoạt chuông thông báo Realtime lên System Layout
-        addNotification('Hoá đơn mới ' + newInv.id + ' vừa xuất hiện. Email đã gửi tự động đến bạn.', 'info');
-      }, 120000); // Demo: Auto gen sau mỗi 2 phút
-      return () => clearInterval(interval);
+      fetchInvoices({ limit: 5 }).then(res => {
+        if (res.success) {
+          // Fake as tenant's invoices for demo
+          setInvoices(res.data.map(inv => ({
+            id: inv._id,
+            roomId: inv.roomId,
+            period: inv.period,
+            roomAmount: inv.roomFee,
+            electricity: inv.electric?.total || 0,
+            water: inv.water?.total || 0,
+            service: (inv.services || []).reduce((a, s) => a + s.amount, 0),
+            date: inv.createdAt ? inv.createdAt.split('T')[0] : '2026-05-01',
+            status: inv.status === 'Paid' ? 'Đã thanh toán' : 'Chờ thanh toán',
+            originalInvoice: inv
+          })));
+        }
+      });
     }
-  }, [user, invoices.length, addNotification]);
+  }, [user]);
 
   useEffect(() => {
     // Kiểm tra nếu redirect về từ VNPay
@@ -83,32 +80,6 @@ const DashboardPage = () => {
     setVnpayModalOpen(true);
   };
 
-  const handleVNPayConfirm = async () => {
-    setIsProcessing(true);
-    try {
-      // Gọi API Backend VNPay đã đổi
-      const response = await fetch('http://localhost:3001/api/vnpay/create_payment_url', {
-         method: 'POST',
-         headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({
-            amount: getTotal(selectedInvoice),
-            invoiceId: selectedInvoice.id
-         })
-      });
-      const data = await response.json();
-      if(data.success) {
-          // Redirect qua Cổng VNPay thật
-          window.location.href = data.paymentUrl;
-      } else {
-          setIsProcessing(false);
-          addNotification('Lỗi khi tạo VNPay Session', 'error');
-      }
-    } catch (e) {
-      setIsProcessing(false);
-      addNotification('Lỗi khi kết nối đến API VNPay', 'error');
-    }
-  };
-
   const handleSendAutoMail = () => {
     setIsSendingMail(true);
     setMailStatus(null);
@@ -119,6 +90,13 @@ const DashboardPage = () => {
   };
 
   const getTotal = (inv) => inv.roomAmount + inv.electricity + inv.water + inv.service;
+
+  const getQrContent = (inv) => {
+    if (!inv || !inv.roomId?.name) return 'PHONG_DEMO_THANG_05_2026';
+    const name = inv.roomId.name.replace(/ /g, '_');
+    const [year, month] = inv.period.split('-');
+    return `PHONG_${name}_THANG_${month}_${year}`;
+  };
 
   const exportPDF = (invoice) => {
     const doc = new jsPDF();
@@ -230,7 +208,7 @@ const DashboardPage = () => {
                                   onClick={() => openVNPay(inv)}
                                   className="mx-auto w-full max-w-[160px] inline-flex items-center justify-center px-3 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold rounded-xl shadow-sm hover:scale-105 transition-all"
                                 >
-                                  <CreditCard className="w-4 h-4 mr-1.5" /> Thanh Toán Online
+                                  <CreditCard className="w-4 h-4 mr-1.5" /> Thanh Toán
                                 </button>
                               )}
                               <button 
@@ -306,13 +284,13 @@ const DashboardPage = () => {
             <div className="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden border border-slate-100 dark:border-slate-700 animate-in zoom-in-95 duration-300">
                <div className="bg-emerald-600 p-6 text-center relative overflow-hidden">
                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-xl -translate-y-1/2 translate-x-1/3"></div>
-                 <h3 className="text-xl font-bold text-white tracking-wider uppercase flex items-center justify-center gap-2 relative z-10"><CreditCard className="w-5 h-5"/> Thanh Toán Mã QR / VNPay</h3>
-                 <p className="text-emerald-100 text-sm mt-1 relative z-10">Mở app Ngân hàng (hoặc VNPay) để quét mã hoặc chuyển tới thẻ ATM.</p>
+                 <h3 className="text-xl font-bold text-white tracking-wider uppercase flex items-center justify-center gap-2 relative z-10"><CreditCard className="w-5 h-5"/> Thanh Toán Qua Mã QR</h3>
+                 <p className="text-emerald-100 text-sm mt-1 relative z-10">Mở app Ngân hàng để quét mã thanh toán hóa đơn này.</p>
                </div>
                
                  <div className="p-8">
                  <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-2xl p-6 text-center mb-6 shadow-inner">
-                    <p className="font-medium text-slate-500 dark:text-slate-400 text-sm border-b border-slate-200 dark:border-slate-700 pb-3 mb-3">Thanh toán hoá đơn: <span className="font-bold text-slate-900 dark:text-white">{selectedInvoice.id}</span></p>
+                    <p className="font-medium text-slate-500 dark:text-slate-400 text-sm border-b border-slate-200 dark:border-slate-700 pb-3 mb-3">Thanh toán hoá đơn: <span className="font-bold text-slate-900 dark:text-white">Phòng {selectedInvoice.roomId?.name || selectedInvoice.id}</span></p>
                     <div className="text-4xl font-black text-emerald-600 dark:text-emerald-400">{getTotal(selectedInvoice).toLocaleString('vi-VN')} VNĐ</div>
                     
                     {/* QR CODE DYNAMIC RENDER */}
@@ -325,7 +303,7 @@ const DashboardPage = () => {
                                 accountNo: config.bankInfo.accountNo,
                                 accountName: config.bankInfo.accountName,
                                 amount: getTotal(selectedInvoice),
-                                content: `PHONG_DEMO_THANG_05_2026`
+                                content: getQrContent(selectedInvoice)
                               })} 
                               alt="QR Thanh Toán"
                               className="w-full h-full object-contain"
@@ -341,22 +319,12 @@ const DashboardPage = () => {
                     <p className="text-xs text-text-muted mt-3 font-medium flex items-center justify-center"><CheckCircle className="w-3.5 h-3.5 mr-1 text-emerald-500" /> Hệ thống tự động duyệt sau 2-5 phút.</p>
                  </div>
                  
-                 <div className="flex gap-4">
+                 <div className="flex justify-center">
                    <button 
                      onClick={() => setVnpayModalOpen(false)}
-                     disabled={isProcessing}
-                     className="flex-1 px-4 py-3 bg-white border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-colors disabled:opacity-50"
+                     className="w-full max-w-[200px] px-4 py-3 bg-white border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-colors"
                    >
-                     Hủy / Đóng
-                   </button>
-                   <button 
-                     onClick={handleVNPayConfirm}
-                     disabled={isProcessing}
-                     className="flex-1 px-4 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-sm shadow-emerald-500/30 transition-all active:scale-95 disabled:opacity-80 flex items-center justify-center"
-                   >
-                     {isProcessing ? (
-                       <><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div> Đang kết nối VNPay...</>
-                     ) : 'Chuyển Tới Cổng VNPay Thật'}
+                     Đóng
                    </button>
                  </div>
                </div>

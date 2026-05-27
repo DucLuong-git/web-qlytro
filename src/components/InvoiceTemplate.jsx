@@ -37,7 +37,7 @@ const InvoiceTemplate = ({ invoice, config, onClose }) => {
   ].filter(d => d.amount > 0);
 
   // VietQR
-  const qrContent = `PHONG_${(room.name || '').replace(/\s+/g, '_')}_THANG_${month}_${year}`;
+  const qrContent = `FPL${invoice._id}`;
   const vietQrUrl = config?.bankInfo?.accountNo
     ? buildVietQrUrl({
         bankId:      config.bankInfo.bankId,

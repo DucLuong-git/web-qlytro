@@ -467,42 +467,58 @@ router.post('/webhook', async (req, res) => {
     await newTx.save();
 
     // 3. Xử lý Logic Gạch nợ Hóa đơn
-    // Định dạng content trong QR là: PHONG_TENPHONG_THANG_MM_YYYY
-    // Chúng ta thử trích xuất tên phòng và tháng năm từ content
-    const match = content.match(/PHONG_(.+?)_THANG_(\d{2})_(\d{4})/i);
+    // Định dạng content trong QR mới: FPL{invoiceId}
+    // Định dạng cũ: PHONG_{TENPHONG}_THANG_MM_YYYY
+    let invoice = null;
+    let room = null;
+    let period = null;
+
+    const matchId = content.match(/FPL([a-fA-F0-9]{24})/i);
     
-    if (match) {
-      const roomNameRaw = match[1].replace(/_/g, ' '); // Khôi phục tên phòng
-      const month = match[2];
-      const year = match[3];
-      const period = `${year}-${month}`;
+    if (matchId) {
+      // Nhận diện theo ID hóa đơn (Mới)
+      const invoiceId = matchId[1];
+      invoice = await Invoice.findById(invoiceId).populate('roomId');
+      if (invoice) {
+        room = invoice.roomId;
+        period = invoice.period;
+      }
+    } else {
+      // Nhận diện theo tên phòng (Cũ/Dự phòng)
+      const match = content.match(/PHONG_(.+?)_THANG_(\d{2})_(\d{4})/i);
+      if (match) {
+        const roomNameRaw = match[1].replace(/_/g, ' '); // Khôi phục tên phòng
+        const month = match[2];
+        const year = match[3];
+        period = `${year}-${month}`;
 
-      // Tìm phòng theo tên (cần cẩn thận với regex query)
-      const room = await Room.findOne({ name: { $regex: new RegExp(`^${roomNameRaw}$`, 'i') } });
+        // Tìm phòng theo tên (cần cẩn thận với regex query)
+        room = await Room.findOne({ name: { $regex: new RegExp(`^${roomNameRaw}$`, 'i') } });
 
-      if (room) {
-        // Tìm hóa đơn của phòng và kỳ này, chưa thanh toán
-        const invoice = await Invoice.findOne({ roomId: room._id, period, status: { $ne: 'Paid' } });
-        
-        if (invoice) {
-          // Cập nhật trạng thái thành Paid
-          invoice.status = 'Paid';
-          invoice.paidAt = new Date();
-          await invoice.save();
-
-          // Gửi sự kiện realtime để Frontend update
-          const io = req.app.get('io');
-          if (io) {
-            io.emit('invoice_updated', {
-              message: `✅ Hóa đơn phòng ${room.name} (${period}) đã được thanh toán tự động qua chuyển khoản!`,
-              invoiceId: invoice._id,
-              status: 'Paid',
-              period
-            });
-          }
-          console.log(`[Webhook] Đã tự động cập nhật thanh toán cho phòng ${room.name} kỳ ${period}`);
+        if (room) {
+          // Tìm hóa đơn của phòng và kỳ này, chưa thanh toán
+          invoice = await Invoice.findOne({ roomId: room._id, period, status: { $ne: 'Paid' } });
         }
       }
+    }
+
+    if (invoice && invoice.status !== 'Paid' && room) {
+      // Cập nhật trạng thái thành Paid
+      invoice.status = 'Paid';
+      invoice.paidAt = new Date();
+      await invoice.save();
+
+      // Gửi sự kiện realtime để Frontend update
+      const io = req.app.get('io');
+      if (io) {
+        io.emit('invoice_updated', {
+          message: `✅ Hóa đơn phòng ${room.name} (${period}) đã được thanh toán tự động qua chuyển khoản!`,
+          invoiceId: invoice._id,
+          status: 'Paid',
+          period
+        });
+      }
+      console.log(`[Webhook] Đã tự động cập nhật thanh toán cho phòng ${room.name} kỳ ${period}`);
     }
 
     res.json({ success: true, message: 'Webhook received' });

@@ -92,10 +92,7 @@ const DashboardPage = () => {
   const getTotal = (inv) => inv.roomAmount + inv.electricity + inv.water + inv.service;
 
   const getQrContent = (inv) => {
-    if (!inv || !inv.roomId?.name) return 'PHONG_DEMO_THANG_05_2026';
-    const name = inv.roomId.name.replace(/ /g, '_');
-    const [year, month] = inv.period.split('-');
-    return `PHONG_${name}_THANG_${month}_${year}`;
+    return `FPL${inv.id || inv._id}`;
   };
 
   const exportPDF = (invoice) => {

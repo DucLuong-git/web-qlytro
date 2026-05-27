@@ -5,6 +5,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { CreditCard, FileText, Download, CheckCircle, Clock, Zap, Droplet, User, BellRing, Mail, Check, AlertCircle } from 'lucide-react';
 import { useNotificationStore } from '../store/notificationStore';
+import { fetchConfig, buildVietQrUrl } from '../services/invoiceApi';
 
 const DashboardPage = () => {
   const user = useAuthStore((state) => state.user);
@@ -25,6 +26,17 @@ const DashboardPage = () => {
   // Admin Auto Mail State
   const [isSendingMail, setIsSendingMail] = useState(false);
   const [mailStatus, setMailStatus] = useState(null);
+
+  // System Config (Bank Info)
+  const [config, setConfig] = useState(null);
+
+  useEffect(() => {
+    fetchConfig().then(res => {
+      if (res.success && res.data) {
+        setConfig(res.data);
+      }
+    }).catch(console.error);
+  }, []);
 
   useEffect(() => {
     if (user?.role === 'TENANT') {
@@ -306,11 +318,21 @@ const DashboardPage = () => {
                     {/* QR CODE DYNAMIC RENDER */}
                     <div className="mt-6 flex justify-center">
                        <div className="w-48 h-48 bg-white p-2 rounded-xl shadow-sm border border-slate-200 relative animate-pulse-glow">
-                          <img 
-                            src={`https://img.vietqr.io/image/970415-113366668888-qr_only.png?amount=${getTotal(selectedInvoice)}&addInfo=${selectedInvoice.id}`} 
-                            alt="QR Thanh Toán"
-                            className="w-full h-full object-contain"
-                          />
+                          {config ? (
+                            <img 
+                              src={buildVietQrUrl({
+                                bankId: config.bankInfo.bankId,
+                                accountNo: config.bankInfo.accountNo,
+                                accountName: config.bankInfo.accountName,
+                                amount: getTotal(selectedInvoice),
+                                content: `PHONG_DEMO_THANG_05_2026`
+                              })} 
+                              alt="QR Thanh Toán"
+                              className="w-full h-full object-contain"
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center w-full h-full text-xs text-slate-400">Đang tải QR...</div>
+                          )}
                           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm">
                              <div className="w-8 h-8 rounded-full border border-emerald-500 flex items-center justify-center font-bold text-[10px] text-emerald-600">PAY</div>
                           </div>

@@ -10,8 +10,8 @@ const DashboardPage = () => {
   const user = useAuthStore((state) => state.user);
   const { addNotification } = useNotificationStore();
   const [invoices, setInvoices] = useState([
-    { id: 'INV-001', roomAmount: 400, electricity: 50, water: 20, service: 30, date: '2026-03-01', status: 'Đã thanh toán' },
-    { id: 'INV-002', roomAmount: 400, electricity: 60, water: 25, service: 30, date: '2026-04-01', status: 'Chờ thanh toán' }
+    { id: 'INV-001', roomAmount: 40000, electricity: 5000, water: 2000, service: 3000, date: '2026-03-01', status: 'Đã thanh toán' },
+    { id: 'INV-002', roomAmount: 40000, electricity: 6000, water: 2500, service: 3000, date: '2026-04-01', status: 'Chờ thanh toán' }
   ]);
   
   const location = useLocation();
@@ -31,10 +31,10 @@ const DashboardPage = () => {
       const interval = setInterval(() => {
         const newInv = { 
           id: `INV-00${invoices.length + 1}`, 
-          roomAmount: 400,
-          electricity: Math.floor(Math.random() * 30) + 40,
-          water: Math.floor(Math.random() * 10) + 15,
-          service: 30,
+          roomAmount: 40000,
+          electricity: Math.floor(Math.random() * 3000) + 4000,
+          water: Math.floor(Math.random() * 1000) + 1500,
+          service: 3000,
           date: new Date().toISOString().split('T')[0], 
           status: 'Chờ thanh toán' 
         };
@@ -129,14 +129,14 @@ const DashboardPage = () => {
     doc.autoTable({
       startY: 105,
       headStyles: { fillColor: [79, 70, 229] },
-      head: [['Hang muc dich vu', 'Don vi', 'So luong/Thang', 'Thanh Tien (USD)']],
+      head: [['Hang muc dich vu', 'Don vi', 'So luong/Thang', 'Thanh Tien (VND)']],
       body: [
-        ['Tien Thue Phong Co Ban', 'Thang', '1', `$${invoice.roomAmount}`],
-        ['Dien chieu sang sinh hoat', 'KWh', 'Theo muc do', `$${invoice.electricity}`],
-        ['Nuoc may sinh hoat', 'M3', 'Theo muc do', `$${invoice.water}`],
-        ['Phi tiep tan, Bao ve, Wifi', 'Goi', 'Trọn goi', `$${invoice.service}`],
+        ['Tien Thue Phong Co Ban', 'Thang', '1', `${invoice.roomAmount}`],
+        ['Dien chieu sang sinh hoat', 'KWh', 'Theo muc do', `${invoice.electricity}`],
+        ['Nuoc may sinh hoat', 'M3', 'Theo muc do', `${invoice.water}`],
+        ['Phi tiep tan, Bao ve, Wifi', 'Goi', 'Trọn goi', `${invoice.service}`],
       ],
-      foot: [['', '', 'TONG CONG THANH TOAN:', `$${getTotal(invoice)}`]],
+      foot: [['', '', 'TONG CONG THANH TOAN:', `${getTotal(invoice)}`]],
       footStyles: { fillColor: [241, 245, 249], textColor: [0, 0, 0], fontStyle: 'bold' },
       theme: 'grid'
     });
@@ -181,7 +181,7 @@ const DashboardPage = () => {
                       <th className="py-4 px-6 font-bold uppercase tracking-wider">Mã Hoá Đơn</th>
                       <th className="py-4 px-6 font-bold uppercase tracking-wider">Kì Hạn</th>
                       <th className="py-4 px-6 font-bold uppercase tracking-wider">Chi Tiết Trích Tiền</th>
-                      <th className="py-4 px-6 font-black uppercase text-emerald-600 dark:text-emerald-400">Thành Tiền($)</th>
+                      <th className="py-4 px-6 font-black uppercase text-emerald-600 dark:text-emerald-400">Thành Tiền(VNĐ)</th>
                       <th className="py-4 px-6 font-bold uppercase tracking-wider text-center">Tình Trạng</th>
                       <th className="py-4 px-6 font-bold text-center uppercase tracking-wider border-l border-slate-200 dark:border-slate-700">Hành Động</th>
                     </tr>
@@ -195,12 +195,12 @@ const DashboardPage = () => {
                           <td className="py-5 px-6 font-medium text-slate-500">{inv.date}</td>
                           <td className="py-5 px-6">
                             <div className="flex gap-2 flex-wrap items-center">
-                              <span className="flex items-center text-xs bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded text-slate-600 dark:text-slate-300"><User className="w-3 h-3 mr-1"/> ${inv.roomAmount}</span>
-                              <span className="flex items-center text-xs bg-orange-50 dark:bg-orange-500/10 px-2 py-1 rounded text-orange-600 dark:text-orange-400"><Zap className="w-3 h-3 mr-1"/> ${inv.electricity}</span>
-                              <span className="flex items-center text-xs bg-cyan-50 dark:bg-cyan-500/10 px-2 py-1 rounded text-cyan-600 dark:text-cyan-400"><Droplet className="w-3 h-3 mr-1"/> ${inv.water}</span>
+                              <span className="flex items-center text-xs bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded text-slate-600 dark:text-slate-300"><User className="w-3 h-3 mr-1"/> {inv.roomAmount.toLocaleString('vi-VN')} đ</span>
+                              <span className="flex items-center text-xs bg-orange-50 dark:bg-orange-500/10 px-2 py-1 rounded text-orange-600 dark:text-orange-400"><Zap className="w-3 h-3 mr-1"/> {inv.electricity.toLocaleString('vi-VN')} đ</span>
+                              <span className="flex items-center text-xs bg-cyan-50 dark:bg-cyan-500/10 px-2 py-1 rounded text-cyan-600 dark:text-cyan-400"><Droplet className="w-3 h-3 mr-1"/> {inv.water.toLocaleString('vi-VN')} đ</span>
                             </div>
                           </td>
-                          <td className="py-5 px-6 font-black text-emerald-600 dark:text-emerald-400 text-lg">${getTotal(inv)}</td>
+                          <td className="py-5 px-6 font-black text-emerald-600 dark:text-emerald-400 text-lg">{getTotal(inv).toLocaleString('vi-VN')} đ</td>
                           <td className="py-5 px-6 text-center">
                             <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold shadow-sm border ${
                               isPaid 
@@ -298,16 +298,16 @@ const DashboardPage = () => {
                  <p className="text-emerald-100 text-sm mt-1 relative z-10">Mở app Ngân hàng (hoặc VNPay) để quét mã hoặc chuyển tới thẻ ATM.</p>
                </div>
                
-               <div className="p-8">
+                 <div className="p-8">
                  <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-2xl p-6 text-center mb-6 shadow-inner">
                     <p className="font-medium text-slate-500 dark:text-slate-400 text-sm border-b border-slate-200 dark:border-slate-700 pb-3 mb-3">Thanh toán hoá đơn: <span className="font-bold text-slate-900 dark:text-white">{selectedInvoice.id}</span></p>
-                    <div className="text-4xl font-black text-emerald-600 dark:text-emerald-400">${getTotal(selectedInvoice)}</div>
+                    <div className="text-4xl font-black text-emerald-600 dark:text-emerald-400">{getTotal(selectedInvoice).toLocaleString('vi-VN')} VNĐ</div>
                     
                     {/* QR CODE DYNAMIC RENDER */}
                     <div className="mt-6 flex justify-center">
                        <div className="w-48 h-48 bg-white p-2 rounded-xl shadow-sm border border-slate-200 relative animate-pulse-glow">
                           <img 
-                            src={`https://img.vietqr.io/image/970415-113366668888-qr_only.png?amount=${getTotal(selectedInvoice)*25000}&addInfo=${selectedInvoice.id}`} 
+                            src={`https://img.vietqr.io/image/970415-113366668888-qr_only.png?amount=${getTotal(selectedInvoice)}&addInfo=${selectedInvoice.id}`} 
                             alt="QR Thanh Toán"
                             className="w-full h-full object-contain"
                           />

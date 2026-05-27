@@ -50,7 +50,7 @@
     {
       "id": "1",
       "name": "Luxury Studio 101",
-      "price": 500,
+      "price": 20000,
       "status": "Available",
       "district": "District 1",
       "address": "123 Nguyen Hue, D1, HCM",
@@ -68,7 +68,7 @@
     {
       "id": "2",
       "name": "Cozy Apt 102",
-      "price": 600,
+      "price": 10000,
       "status": "Occupied",
       "district": "Binh Thanh",
       "address": "456 Xo Viet Nghe Tinh, HCM",
@@ -86,7 +86,7 @@
     {
       "id": "3",
       "name": "Penthouse Suite 103",
-      "price": 1200,
+      "price": 40000,
       "status": "Available",
       "district": "District 2",
       "address": "Thao Dien, D2, HCM",
@@ -106,7 +106,7 @@
     {
       "id": "4",
       "name": "Minimalist Room 104",
-      "price": 300,
+      "price": 40000,
       "status": "Maintenance",
       "district": "District 7",
       "address": "Nguyen Van Linh, D7, HCM",
@@ -123,7 +123,7 @@
     {
       "id": "10",
       "name": "Duplex Cửa Sổ Kính Lớn",
-      "price": 650,
+      "price": 10000,
       "district": "Quận 3",
       "status": "Available",
       "type": "Chung Cư Mini",
@@ -139,7 +139,7 @@
     {
       "id": "11",
       "name": "Nhà Nguyên Căn Full Đồ",
-      "price": 900,
+      "price": 70000,
       "district": "Quận 7",
       "status": "Occupied",
       "type": "Nhà nguyên căn",
@@ -152,7 +152,7 @@
     {
       "id": "12",
       "name": "Sleepbox Vip Có Massage",
-      "price": 150,
+      "price": 60000,
       "district": "Gò Vấp",
       "status": "Available",
       "type": "KTX",
@@ -165,7 +165,7 @@
     {
       "id": "13",
       "name": "Phòng Trọ Siêu Cấp",
-      "price": 300,
+      "price": 60000,
       "district": "Thủ Đức",
       "status": "Available",
       "type": "Phòng trọ",
@@ -178,7 +178,7 @@
     {
       "id": "14",
       "name": "Khu Trọ Cao Cấp Quận 10",
-      "price": 420,
+      "price": 20000,
       "district": "Quận 10",
       "status": "Available",
       "type": "Phòng trọ",
@@ -191,12 +191,15 @@
     {
       "id": "P7jMZvO_ifo",
       "name": "Phòng Vip 2 Người",
-      "price": 300,
+      "price": 60000,
       "status": "Available",
       "type": "Phòng trọ",
       "district": "Nam Từ Liêm",
       "address": "150 Phạm Văn Đồng, Nam Từ Liêm, Hà Nội",
-      "amenities": ["WiFi", "Máy Lạnh"]
+      "amenities": [
+        "WiFi",
+        "Máy Lạnh"
+      ]
     }
   ],
   "tenants": [

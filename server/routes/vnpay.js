@@ -43,8 +43,8 @@ router.post('/create_payment_url', (req, res) => {
     let bankCode = req.body.bankCode;
     let locale = req.body.language || 'vn';
     
-    // Nếu dùng giá USD trên UI, nhân với tỉ giá (ví dụ 25,000)
-    let amountVND = Number(amount) * 25000;
+    // Đã chuyển sang tiền VNĐ nên không nhân tỉ giá nữa
+    let amountVND = Number(amount);
     
     let currCode = 'VND';
     let vnp_Params = {};

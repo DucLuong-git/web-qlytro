@@ -18,6 +18,7 @@ import {
   smartFetchInvoices, bulkSaveInvoices, updateInvoice,
   uploadEvidence, fetchInvoiceById,
 } from '../../services/invoiceApi';
+import { socket } from '../../services/socket';
 import InvoiceTemplate from '../../components/InvoiceTemplate';
 import ConfigModal from './ConfigModal';
 
@@ -183,6 +184,28 @@ export default function InvoiceManagementPage() {
       setLoading(false);
     }
   }, [period]);
+
+  /* real-time data sync */
+  useEffect(() => {
+    const onUpdate = (data) => {
+      // If the update is for the current period or doesn't specify, refetch
+      if (!data.period || data.period === period) {
+        handleFetch();
+      }
+    };
+
+    socket.on('invoice_created', onUpdate);
+    socket.on('invoice_updated', onUpdate);
+    socket.on('invoices_bulk_updated', onUpdate);
+    socket.on('invoice_deleted', onUpdate);
+
+    return () => {
+      socket.off('invoice_created', onUpdate);
+      socket.off('invoice_updated', onUpdate);
+      socket.off('invoices_bulk_updated', onUpdate);
+      socket.off('invoice_deleted', onUpdate);
+    };
+  }, [handleFetch, period]);
 
   const setRow = (idx, patch) =>
     setRows(prev => prev.map((r, i) => i !== idx ? r : { ...r, ...patch, dirty: true }));

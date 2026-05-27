@@ -175,6 +175,18 @@ router.post('/', async (req, res) => {
     await invoice.save();
 
     const populated = await invoice.populate('roomId', 'name address district price');
+    
+    // Gửi sự kiện realtime
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('invoice_created', {
+        message: `Hóa đơn phòng ${populated.roomId?.name || ''} kỳ ${body.period} vừa được tạo.`,
+        invoiceId: populated._id,
+        period: body.period,
+        roomId: populated.roomId?._id
+      });
+    }
+
     res.status(201).json({ success: true, data: populated, message: 'Tạo hóa đơn thành công.' });
   } catch (err) {
     console.error('[POST /invoices]', err);
@@ -242,6 +254,17 @@ router.put('/bulk-save', async (req, res) => {
     });
 
     const result = await Invoice.bulkWrite(ops);
+
+    // Gửi sự kiện realtime
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('invoices_bulk_updated', {
+        message: `Dữ liệu điện nước kỳ ${period} vừa được cập nhật tập trung.`,
+        period,
+        count: result.upsertedCount + result.modifiedCount
+      });
+    }
+
     res.json({
       success: true,
       message: `Đã lưu ${result.upsertedCount + result.modifiedCount} hóa đơn.`,
@@ -287,6 +310,17 @@ router.put('/:id', async (req, res) => {
     ).populate('roomId', 'name address district price');
 
     if (!invoice) return res.status(404).json({ success: false, message: 'Không tìm thấy hóa đơn.' });
+
+    // Gửi sự kiện realtime
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('invoice_updated', {
+        message: `Hóa đơn phòng ${invoice.roomId?.name || ''} kỳ ${invoice.period} vừa được cập nhật.`,
+        invoiceId: invoice._id,
+        status: invoice.status,
+        period: invoice.period
+      });
+    }
 
     res.json({ success: true, data: invoice, message: 'Cập nhật hóa đơn thành công.' });
   } catch (err) {
@@ -372,9 +406,78 @@ router.delete('/:id', async (req, res) => {
   try {
     const invoice = await Invoice.findByIdAndDelete(req.params.id);
     if (!invoice) return res.status(404).json({ success: false, message: 'Không tìm thấy hóa đơn.' });
+
+    // Gửi sự kiện realtime
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('invoice_deleted', {
+        message: `Một hóa đơn kỳ ${invoice.period} vừa bị xóa.`,
+        invoiceId: invoice._id,
+        period: invoice.period
+      });
+    }
+
     res.json({ success: true, message: 'Đã xóa hóa đơn.' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi server.' });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// POST /api/invoices/webhook — Nhận thông báo biến động số dư (SePay/Casso)
+// ═══════════════════════════════════════════════════════════════════
+router.post('/webhook', async (req, res) => {
+  try {
+    const data = req.body;
+    console.log('[Webhook] Nhận dữ liệu thanh toán:', data);
+
+    // Xử lý dữ liệu từ SePay
+    // SePay thường gửi: { transferAmount, transferType: "in", content, ... }
+    const content = data.content || data.description || '';
+    const amount = Number(data.transferAmount || data.amount || 0);
+
+    // Định dạng content trong QR là: PHONG_TENPHONG_THANG_MM_YYYY
+    // Chúng ta thử trích xuất tên phòng và tháng năm từ content
+    const match = content.match(/PHONG_([A-Za-z0-9_]+)_THANG_(\d{2})_(\d{4})/i);
+    
+    if (match) {
+      const roomNameRaw = match[1].replace(/_/g, ' '); // Khôi phục tên phòng
+      const month = match[2];
+      const year = match[3];
+      const period = `${year}-${month}`;
+
+      // Tìm phòng theo tên (cần cẩn thận với regex query)
+      const room = await Room.findOne({ name: { $regex: new RegExp(`^${roomNameRaw}$`, 'i') } });
+
+      if (room) {
+        // Tìm hóa đơn của phòng và kỳ này, chưa thanh toán
+        const invoice = await Invoice.findOne({ roomId: room._id, period, status: { $ne: 'Paid' } });
+        
+        if (invoice) {
+          // Cập nhật trạng thái thành Paid
+          invoice.status = 'Paid';
+          invoice.paidAt = new Date();
+          await invoice.save();
+
+          // Gửi sự kiện realtime để Frontend update
+          const io = req.app.get('io');
+          if (io) {
+            io.emit('invoice_updated', {
+              message: `✅ Hóa đơn phòng ${room.name} (${period}) đã được thanh toán tự động qua chuyển khoản!`,
+              invoiceId: invoice._id,
+              status: 'Paid',
+              period
+            });
+          }
+          console.log(`[Webhook] Đã tự động cập nhật thanh toán cho phòng ${room.name} kỳ ${period}`);
+        }
+      }
+    }
+
+    res.json({ success: true, message: 'Webhook received' });
+  } catch (err) {
+    console.error('[Webhook Error]', err);
+    res.status(500).json({ success: false, message: 'Server Error' });
   }
 });
 

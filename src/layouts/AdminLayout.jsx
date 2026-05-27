@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Layout, Menu, Button, ConfigProvider, theme as antTheme, Avatar } from 'antd';
+import { Layout, Menu, Button, ConfigProvider, theme as antTheme, Avatar, notification } from 'antd';
 import { 
   BarChartOutlined, 
   HomeOutlined, 
@@ -15,6 +15,7 @@ import { Moon, Sun } from 'lucide-react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
+import { socket } from '../services/socket';
 
 const { Header, Sider, Content, Footer } = Layout;
 
@@ -24,6 +25,34 @@ const AdminLayout = () => {
   const { darkMode, toggleTheme } = useThemeStore();
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    // Setup socket listeners
+    const onInvoiceCreated = (data) => {
+      notification.success({ message: 'Tạo mới', description: data.message, placement: 'bottomRight' });
+    };
+    const onInvoiceUpdated = (data) => {
+      notification.info({ message: 'Cập nhật', description: data.message, placement: 'bottomRight' });
+    };
+    const onInvoicesBulkUpdated = (data) => {
+      notification.info({ message: 'Lưu tập trung', description: data.message, placement: 'bottomRight' });
+    };
+    const onInvoiceDeleted = (data) => {
+      notification.warning({ message: 'Xóa hóa đơn', description: data.message, placement: 'bottomRight' });
+    };
+
+    socket.on('invoice_created', onInvoiceCreated);
+    socket.on('invoice_updated', onInvoiceUpdated);
+    socket.on('invoices_bulk_updated', onInvoicesBulkUpdated);
+    socket.on('invoice_deleted', onInvoiceDeleted);
+
+    return () => {
+      socket.off('invoice_created', onInvoiceCreated);
+      socket.off('invoice_updated', onInvoiceUpdated);
+      socket.off('invoices_bulk_updated', onInvoicesBulkUpdated);
+      socket.off('invoice_deleted', onInvoiceDeleted);
+    };
+  }, []);
 
   const handleLogout = () => {
     logout();

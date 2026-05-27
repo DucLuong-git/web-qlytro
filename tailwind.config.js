@@ -18,6 +18,15 @@ export default {
         900: '900',
       },
       colors: {
+        /* ── Semantic Variables (Light/Dark) ── */
+        primary: 'var(--bg-primary)',
+        secondary: 'var(--bg-secondary)',
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'border-color': 'var(--border-color)',
+        'card-bg': 'var(--card-bg)',
+        'input-bg': 'var(--input-bg)',
+
         /* ── Airbnb Design System ── */
         rausch:      '#ff385c',
         'rausch-deep': '#e00b41',
@@ -33,11 +42,11 @@ export default {
         'error-red':  '#c13515',
 
         /* ── Legacy compat ── */
-        surface:    '#ffffff',
-        background: '#f7f7f7',
+        surface:    'var(--bg-primary)',
+        background: 'var(--bg-secondary)',
         text: {
-          main:  '#222222',
-          muted: '#6a6a6a',
+          main:  'var(--text-primary)',
+          muted: 'var(--text-secondary)',
         },
         status: {
           danger:  '#c13515',

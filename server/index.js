@@ -4,6 +4,8 @@ const cors = require('cors');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const path = require('path');
+const http = require('http');
+const { Server } = require('socket.io');
 
 // ─── Import Routes ───────────────────────────────────────────────
 const authRoutes    = require('./routes/auth');
@@ -17,6 +19,24 @@ const vnpayRoutes   = require('./routes/vnpay');
 const invoiceRoutes = require('./routes/invoices');
 
 const app  = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000', 'https://luong.io.vn', 'http://luong.io.vn'],
+    credentials: true,
+  }
+});
+
+// Gắn io vào app để truy cập từ các route (ví dụ: req.app.get('io').emit(...))
+app.set('io', io);
+
+io.on('connection', (socket) => {
+  console.log('🔌 Client connected:', socket.id);
+  socket.on('disconnect', () => {
+    console.log('🔌 Client disconnected:', socket.id);
+  });
+});
+
 const PORT = process.env.PORT || 3001;
 
 // ─── Middleware ───────────────────────────────────────────────────
@@ -80,10 +100,10 @@ app.use((err, req, res, next) => {
 });
 
 // ─── Start ───────────────────────────────────────────────────────
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`\n🚀 Server đang chạy tại: http://localhost:${PORT}`);
   console.log(`📦 API Base: http://localhost:${PORT}/api`);
   console.log(`🌿 Môi trường: ${process.env.NODE_ENV}\n`);
 });
 
-module.exports = app;
+module.exports = server;

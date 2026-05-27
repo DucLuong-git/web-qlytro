@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Modal, Form, InputNumber, Input, Button, Divider, message, Spin } from 'antd';
+import { Modal, Form, InputNumber, Input, Button, Divider, message, Select } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 import { updateConfig } from '../../services/invoiceApi';
 
@@ -95,10 +95,29 @@ const ConfigModal = ({ open, config, onClose, onSaved }) => {
           Thông tin ngân hàng (VietQR)
         </Divider>
 
-        <Form.Item label="Mã ngân hàng (vd: VCB, TCB, MB)" name="bankId">
-          <Input placeholder="VCB" style={{ borderRadius: 8 }} />
+        <Form.Item label="Ngân hàng" name="bankId" rules={[{ required: true, message: 'Vui lòng chọn ngân hàng' }]}>
+          <Select
+            showSearch
+            placeholder="Chọn ngân hàng (vd: VCB, MB, TCB)"
+            style={{ borderRadius: 8 }}
+            options={[
+              { value: 'VCB', label: 'Vietcombank (VCB)' },
+              { value: 'MB', label: 'MBBank (MB)' },
+              { value: 'TCB', label: 'Techcombank (TCB)' },
+              { value: 'CTG', label: 'VietinBank (CTG)' },
+              { value: 'BIDV', label: 'BIDV' },
+              { value: 'VBA', label: 'Agribank (VBA)' },
+              { value: 'ACB', label: 'ACB' },
+              { value: 'VPB', label: 'VPBank (VPB)' },
+              { value: 'TPB', label: 'TPBank (TPB)' },
+              { value: 'STB', label: 'Sacombank (STB)' },
+              { value: 'HDB', label: 'HDBank (HDB)' },
+              { value: 'VIB', label: 'VIB' },
+              { value: 'TIMO', label: 'Timo' },
+            ]}
+          />
         </Form.Item>
-        <Form.Item label="Số tài khoản" name="accountNo">
+        <Form.Item label="Số tài khoản" name="accountNo" rules={[{ required: true, message: 'Vui lòng nhập STK' }]}>
           <Input placeholder="0123456789" style={{ borderRadius: 8 }} />
         </Form.Item>
         <Form.Item label="Tên chủ tài khoản (KHÔNG DẤU)" name="accountName">

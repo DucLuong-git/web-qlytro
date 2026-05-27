@@ -41,7 +41,7 @@ export const sendNotification = (invoiceId, { email } = {}) =>
   invoiceApi.post(`/${invoiceId}/send-notification`, { email }).then(r => r.data);
 
 // VietQR — sinh QR động từ vietqr.io
-export const buildVietQrUrl = ({ bankId, accountNo, accountName, amount, content }) => {
+export const buildVietQrUrl = ({ bankId, accountNo, amount, content }) => {
   const encoded = encodeURIComponent(content);
-  return `https://img.vietqr.io/image/${bankId}-${accountNo}-compact2.png?amount=${amount}&addInfo=${encoded}&accountName=${encodeURIComponent(accountName)}`;
+  return `https://qr.sepay.vn/img?acc=${accountNo}&bank=${bankId}&amount=${amount}&des=${encoded}`;
 };

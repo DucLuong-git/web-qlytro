@@ -3,6 +3,7 @@ const router = express.Router();
 const Invoice = require('../models/Invoice');
 const ConfigService = require('../models/ConfigService');
 const Room = require('../models/Room');
+const Transaction = require('../models/Transaction');
 const { upload, uploadToCloudinary } = require('../middleware/cloudinaryUpload');
 const { sendInvoiceEmail, buildZaloTemplate } = require('../middleware/mailer');
 
@@ -435,7 +436,37 @@ router.post('/webhook', async (req, res) => {
     // SePay thường gửi: { transferAmount, transferType: "in", content, ... }
     const content = data.content || data.description || '';
     const amount = Number(data.transferAmount || data.amount || 0);
+    const sepayId = data.id || data.transaction_id; // SePay gửi id giao dịch
 
+    if (!sepayId) {
+       return res.status(400).json({ success: false, message: 'Thiếu ID giao dịch' });
+    }
+
+    // 1. Kiểm tra xem giao dịch này đã được xử lý chưa (chống trùng lặp)
+    const existingTx = await Transaction.findOne({ sepay_id: sepayId });
+    if (existingTx) {
+      console.log(`[Webhook] Giao dịch ${sepayId} đã tồn tại, bỏ qua.`);
+      return res.json({ success: true, message: 'Giao dịch đã được xử lý trước đó' });
+    }
+
+    // 2. Lưu giao dịch vào Database
+    const newTx = new Transaction({
+      sepay_id: sepayId,
+      gateway: data.gateway || 'SePay',
+      transaction_date: data.transactionDate ? new Date(data.transactionDate) : new Date(),
+      account_number: data.accountNumber,
+      sub_account: data.subAccount,
+      code: data.code,
+      amount_in: data.transferType === 'in' ? amount : 0,
+      amount_out: data.transferType === 'out' ? amount : 0,
+      accumulated: data.accumulated,
+      content: content,
+      reference_code: data.referenceCode,
+      body: data
+    });
+    await newTx.save();
+
+    // 3. Xử lý Logic Gạch nợ Hóa đơn
     // Định dạng content trong QR là: PHONG_TENPHONG_THANG_MM_YYYY
     // Chúng ta thử trích xuất tên phòng và tháng năm từ content
     const match = content.match(/PHONG_([A-Za-z0-9_]+)_THANG_(\d{2})_(\d{4})/i);

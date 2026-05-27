@@ -469,7 +469,7 @@ router.post('/webhook', async (req, res) => {
     // 3. Xử lý Logic Gạch nợ Hóa đơn
     // Định dạng content trong QR là: PHONG_TENPHONG_THANG_MM_YYYY
     // Chúng ta thử trích xuất tên phòng và tháng năm từ content
-    const match = content.match(/PHONG_([A-Za-z0-9_]+)_THANG_(\d{2})_(\d{4})/i);
+    const match = content.match(/PHONG_(.+?)_THANG_(\d{2})_(\d{4})/i);
     
     if (match) {
       const roomNameRaw = match[1].replace(/_/g, ' '); // Khôi phục tên phòng

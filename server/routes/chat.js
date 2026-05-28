@@ -48,6 +48,30 @@ router.get('/room/:tenantId', protect, async (req, res) => {
 });
 
 // ============================================================================
+// API 1.5: Lấy phòng chat của MÌNH (Dành cho Tenant hoặc Admin đã được gán)
+// Frontend gọi API này để không cần biết tenantId
+// ============================================================================
+router.get('/my-room', protect, async (req, res) => {
+  try {
+    // Tìm participant của user này (Lấy phòng chat đầu tiên mà họ tham gia)
+    const participant = await ChatParticipant.findOne({ userId: req.user._id }).populate('roomId');
+    
+    if (!participant || !participant.roomId) {
+      return res.status(404).json({ success: false, message: 'Bạn chưa có phòng chat nào.' });
+    }
+
+    const room = participant.roomId;
+    const participants = await ChatParticipant.find({ roomId: room._id })
+      .populate('userId', 'name email avatar role');
+
+    res.json({ success: true, room, participants });
+  } catch (error) {
+    console.error('[GET /chat/my-room]', error);
+    res.status(500).json({ success: false, message: 'Lỗi máy chủ nội bộ.' });
+  }
+});
+
+// ============================================================================
 // API 2: Lấy lịch sử tin nhắn của phòng (Có phân trang)
 // ============================================================================
 router.get('/messages/:roomId', protect, async (req, res) => {

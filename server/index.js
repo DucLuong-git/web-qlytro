@@ -38,6 +38,10 @@ io.on('connection', (socket) => {
   });
 });
 
+// ─── Tích hợp Chat Socket ─────────────────────────────────────────
+const chatSocketInit = require('./sockets/chatSocket');
+chatSocketInit(io);
+
 const PORT = process.env.PORT || 3001;
 
 // ─── Middleware ───────────────────────────────────────────────────

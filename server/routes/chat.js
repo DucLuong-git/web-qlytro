@@ -53,10 +53,44 @@ router.get('/room/:tenantId', protect, async (req, res) => {
 // ============================================================================
 router.get('/my-room', protect, async (req, res) => {
   try {
-    // Tìm participant của user này (Lấy phòng chat đầu tiên mà họ tham gia)
-    const participant = await ChatParticipant.findOne({ userId: req.user._id }).populate('roomId');
+    let participant = await ChatParticipant.findOne({ userId: req.user._id }).populate('roomId');
     
     if (!participant || !participant.roomId) {
+      // Tự động tạo phòng (Self-healing) nếu user là TENANT mà chưa có phòng
+      if (req.user.role === 'TENANT') {
+        const Tenant = require('../models/Tenant');
+        const User = require('../models/User');
+        
+        // Tìm bản ghi Tenant tương ứng với email của User
+        const tenantRecord = await Tenant.findOne({ email: req.user.email });
+        
+        if (tenantRecord) {
+           // 1. Tạo phòng chat mới
+           const newRoom = await ChatRoom.create({ 
+             tenantId: tenantRecord._id, 
+             name: `Phòng hỗ trợ - ${req.user.name}` 
+           });
+           
+           // 2. Lấy danh sách toàn bộ Admin/Owner
+           const admins = await User.find({ role: { $in: ['ADMIN', 'OWNER'] } });
+           
+           // 3. Đưa Tenant và các Admin vào phòng
+           const participantsToInsert = [
+             { roomId: newRoom._id, userId: req.user._id },
+             ...admins.map(admin => ({ roomId: newRoom._id, userId: admin._id }))
+           ];
+           
+           await ChatParticipant.insertMany(participantsToInsert);
+           
+           // 4. Lấy lại danh sách participant đã populate để trả về
+           const room = newRoom;
+           const participants = await ChatParticipant.find({ roomId: room._id })
+             .populate('userId', 'name email avatar role');
+             
+           return res.json({ success: true, room, participants });
+        }
+      }
+
       return res.status(404).json({ success: false, message: 'Bạn chưa có phòng chat nào.' });
     }
 

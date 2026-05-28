@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import io from 'socket.io-client';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { CreditCard, FileText, Download, CheckCircle, Clock, Zap, Droplet, User, BellRing, Mail, Check, AlertCircle } from 'lucide-react';
@@ -11,6 +12,7 @@ const DashboardPage = () => {
   const user = useAuthStore((state) => state.user);
   const { addNotification } = useNotificationStore();
   const [invoices, setInvoices] = useState([]);
+  const [socket, setSocket] = useState(null);
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -35,11 +37,10 @@ const DashboardPage = () => {
     }).catch(console.error);
   }, []);
 
-  useEffect(() => {
+  const loadInvoices = () => {
     if (user?.role === 'TENANT') {
       fetchInvoices({ limit: 5 }).then(res => {
         if (res.success) {
-          // Fake as tenant's invoices for demo
           setInvoices(res.data.map(inv => ({
             id: inv._id,
             roomId: inv.roomId,
@@ -55,7 +56,26 @@ const DashboardPage = () => {
         }
       });
     }
+  };
+
+  useEffect(() => {
+    loadInvoices();
   }, [user]);
+
+  useEffect(() => {
+    const newSocket = io(window.location.origin);
+    setSocket(newSocket);
+    return () => newSocket.close();
+  }, []);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('invoice_updated', (data) => {
+        addNotification(data.message, 'success');
+        loadInvoices(); // Refresh the list
+      });
+    }
+  }, [socket]);
 
   useEffect(() => {
     // Kiểm tra nếu redirect về từ VNPay

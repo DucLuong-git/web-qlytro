@@ -17,6 +17,7 @@ const userRoutes    = require('./routes/users');
 const reportRoutes  = require('./routes/reports');
 const vnpayRoutes   = require('./routes/vnpay');
 const invoiceRoutes = require('./routes/invoices');
+const chatRoutes    = require('./routes/chat');
 
 const app  = express();
 const server = http.createServer(app);
@@ -65,6 +66,7 @@ app.use('/api/contracts', contractRoutes);
 app.use('/api/reports',   reportRoutes);
 app.use('/api/vnpay',     vnpayRoutes);
 app.use('/api/invoices',  invoiceRoutes);
+app.use('/api/chat',      chatRoutes);
 
 // ─── Health Check ─────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {

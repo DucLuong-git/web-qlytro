@@ -49,7 +49,7 @@ const ChatWidget = () => {
         const roomData = await roomRes.json();
         
         if (!roomData.success) {
-          setError('Bạn chưa có phòng chat hỗ trợ.');
+          setError(roomData.message || 'Lỗi: Không lấy được phòng chat.');
           setIsLoading(false);
           return;
         }
@@ -142,12 +142,15 @@ const ChatWidget = () => {
   };
 
   if (!user) return null;
+  
+  // Ẩn ở trang chủ (/)
+  if (window.location.pathname === '/') return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end">
+    <div className="fixed bottom-6 left-6 z-[9999] flex flex-col items-start">
       {/* Khung Chat */}
       {isOpen && (
-        <div className="w-[350px] sm:w-[400px] h-[500px] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col mb-4 overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-300 origin-bottom-right">
+        <div className="w-[350px] sm:w-[400px] h-[500px] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col mb-4 overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-300 origin-bottom-left">
           {/* Header */}
           <div className="bg-indigo-600 dark:bg-indigo-700 text-white p-4 flex justify-between items-center shadow-md z-10">
             <div className="flex-1 mr-4">

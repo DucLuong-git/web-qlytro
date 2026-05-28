@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageCircle, X, Send, User } from 'lucide-react';
+import { MessageCircle, X, Send, User, Edit2, Check } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import io from 'socket.io-client';
 
 const ChatWidget = () => {
-  const { user, token } = useAuthStore();
+  const { user } = useAuthStore();
+  const token = localStorage.getItem('token');
   const [isOpen, setIsOpen] = useState(false);
   
   const [room, setRoom] = useState(null);
@@ -13,6 +14,8 @@ const ChatWidget = () => {
   const [socket, setSocket] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editNameValue, setEditNameValue] = useState('');
   const messagesEndRef = useRef(null);
 
   // Auto scroll to bottom
@@ -76,6 +79,10 @@ const ChatWidget = () => {
             setMessages((prev) => [...prev, msg]);
           });
 
+          activeSocket.on('room_renamed', (updatedRoom) => {
+            setRoom(updatedRoom);
+          });
+
           activeSocket.on('error', (err) => {
             console.error('Socket error:', err);
             setError(err.message || 'Lỗi kết nối chat');
@@ -118,6 +125,19 @@ const ChatWidget = () => {
     setNewMessage('');
   };
 
+  const handleRenameRoom = () => {
+    if (!editNameValue.trim() || !socket || !room) return;
+    
+    socket.emit('rename_room', { roomId: room._id, name: editNameValue.trim() }, (res) => {
+      if (res.success) {
+        setRoom(res.room);
+        setIsEditingName(false);
+      } else {
+        alert(res.error || 'Đổi tên thất bại');
+      }
+    });
+  };
+
   if (!user) return null;
 
   return (
@@ -127,11 +147,38 @@ const ChatWidget = () => {
         <div className="w-[350px] sm:w-[400px] h-[500px] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col mb-4 overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-300 origin-bottom-right">
           {/* Header */}
           <div className="bg-indigo-600 dark:bg-indigo-700 text-white p-4 flex justify-between items-center shadow-md z-10">
-            <div>
-              <h3 className="font-bold text-lg leading-tight">{room ? room.name : 'Trung tâm Hỗ trợ'}</h3>
-              <p className="text-xs text-indigo-200">{room ? 'Quản lý viên đang trực' : 'Đang kết nối...'}</p>
+            <div className="flex-1 mr-4">
+              {isEditingName ? (
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="text" 
+                    value={editNameValue}
+                    onChange={(e) => setEditNameValue(e.target.value)}
+                    className="flex-1 bg-white/20 border-none rounded px-2 py-1 text-sm text-white placeholder-white/50 focus:outline-none focus:ring-1 focus:ring-white"
+                    autoFocus
+                  />
+                  <button onClick={handleRenameRoom} className="p-1 hover:bg-white/20 rounded text-emerald-300"><Check className="w-4 h-4" /></button>
+                  <button onClick={() => setIsEditingName(false)} className="p-1 hover:bg-white/20 rounded text-rose-300"><X className="w-4 h-4" /></button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-lg leading-tight truncate" title={room ? room.name || 'Trung tâm Hỗ trợ' : 'Trung tâm Hỗ trợ'}>
+                    {room ? room.name || 'Trung tâm Hỗ trợ' : 'Trung tâm Hỗ trợ'}
+                  </h3>
+                  {room && (
+                    <button 
+                      onClick={() => { setIsEditingName(true); setEditNameValue(room.name || ''); }}
+                      className="p-1 hover:bg-white/20 rounded-full transition-colors opacity-70 hover:opacity-100 shrink-0"
+                      title="Đổi tên nhóm chat"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              )}
+              {!isEditingName && <p className="text-xs text-indigo-200 mt-0.5">{room ? 'Quản lý viên đang trực' : 'Đang kết nối...'}</p>}
             </div>
-            <button 
+            <button  
               onClick={() => setIsOpen(false)}
               className="p-1 hover:bg-white/20 rounded-full transition-colors"
             >

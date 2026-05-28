@@ -119,4 +119,33 @@ router.get('/messages/:roomId', protect, async (req, res) => {
   }
 });
 
+// ============================================================================
+// API 3: Đổi tên phòng chat
+// ============================================================================
+router.put('/room/:roomId', protect, async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const { name } = req.body;
+    
+    // Kiểm tra quyền
+    const isSystemAdmin = ['ADMIN', 'OWNER'].includes(req.user.role);
+    const participant = await ChatParticipant.findOne({ roomId, userId: req.user._id });
+
+    if (!isSystemAdmin && !participant) {
+      return res.status(403).json({ success: false, message: 'Bạn không có quyền đổi tên phòng này.' });
+    }
+
+    const updatedRoom = await ChatRoom.findByIdAndUpdate(
+      roomId, 
+      { name: name || 'Trung tâm Hỗ trợ' }, 
+      { new: true }
+    );
+    
+    res.json({ success: true, room: updatedRoom });
+  } catch (error) {
+    console.error('[PUT /chat/room/:roomId]', error);
+    res.status(500).json({ success: false, message: 'Lỗi máy chủ nội bộ.' });
+  }
+});
+
 module.exports = router;

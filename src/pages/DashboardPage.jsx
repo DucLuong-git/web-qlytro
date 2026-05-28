@@ -7,7 +7,6 @@ import 'jspdf-autotable';
 import { CreditCard, FileText, Download, CheckCircle, Clock, Zap, Droplet, User, BellRing, Mail, Check, AlertCircle } from 'lucide-react';
 import { useNotificationStore } from '../store/notificationStore';
 import { fetchConfig, buildVietQrUrl, fetchInvoices } from '../services/invoiceApi';
-import ChatWidget from '../components/ChatWidget';
 
 const DashboardPage = () => {
   const user = useAuthStore((state) => state.user);
@@ -377,9 +376,6 @@ const DashboardPage = () => {
             </div>
          </div>
       )}
-
-      {/* Tích hợp Chat Widget */}
-      <ChatWidget />
     </>
   );
 };

@@ -9,6 +9,7 @@ import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
 import { useNotificationStore } from '../store/notificationStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import ChatWidget from '../components/ChatWidget';
 
 const MainLayout = () => {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -472,6 +473,9 @@ const MainLayout = () => {
           );
         })}
       </nav>
+
+      {/* Global Chat Widget */}
+      {isAuthenticated && <ChatWidget />}
     </div>
   );
 };

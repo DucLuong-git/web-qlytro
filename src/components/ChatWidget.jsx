@@ -16,6 +16,8 @@ const ChatWidget = () => {
   const [error, setError] = useState(null);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editNameValue, setEditNameValue] = useState('');
+  const [participants, setParticipants] = useState([]);
+  const [showInfo, setShowInfo] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Auto scroll to bottom
@@ -53,6 +55,7 @@ const ChatWidget = () => {
         }
         
         setRoom(roomData.room);
+        setParticipants(roomData.participants || []);
 
         // 2. Lấy lịch sử tin nhắn
         const msgRes = await fetch(`${window.location.origin}/api/chat/messages/${roomData.room._id}`, {
@@ -178,16 +181,48 @@ const ChatWidget = () => {
               )}
               {!isEditingName && <p className="text-xs text-indigo-200 mt-0.5">{room ? 'Quản lý viên đang trực' : 'Đang kết nối...'}</p>}
             </div>
-            <button  
-              onClick={() => setIsOpen(false)}
-              className="p-1 hover:bg-white/20 rounded-full transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button 
+                onClick={() => setShowInfo(!showInfo)}
+                className={`p-1.5 rounded-full transition-colors ${showInfo ? 'bg-white/30' : 'hover:bg-white/20'}`}
+                title="Thông tin nhóm"
+              >
+                <User className="w-5 h-5" />
+              </button>
+              <button  
+                onClick={() => setIsOpen(false)}
+                className="p-1.5 hover:bg-white/20 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
-          {/* Body - Danh sách tin nhắn */}
-          <div className="flex-1 overflow-y-auto p-4 bg-slate-50 dark:bg-slate-900/50 space-y-4">
+          {/* Body - Danh sách tin nhắn hoặc Thông tin nhóm */}
+          <div className="flex-1 overflow-y-auto p-4 bg-slate-50 dark:bg-slate-900/50 space-y-4 relative">
+            {showInfo ? (
+              <div className="absolute inset-0 bg-white dark:bg-slate-800 p-4 z-20 overflow-y-auto animate-in slide-in-from-right-4 duration-200">
+                <h4 className="font-semibold text-slate-800 dark:text-slate-100 mb-4 border-b border-slate-100 dark:border-slate-700 pb-2">Thành viên trong nhóm ({participants.length})</h4>
+                <div className="space-y-3">
+                  {participants.map(p => (
+                    <div key={p._id} className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden shrink-0">
+                        {p.userId?.avatar ? (
+                           <img src={p.userId.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                           <User className="w-5 h-5 text-slate-500" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm text-slate-800 dark:text-slate-100 leading-tight">{p.userId?.name || 'Unknown'}</p>
+                        <p className="text-xs text-slate-500 capitalize">{p.role === 'TENANT' ? 'Khách thuê' : p.role === 'OWNER' ? 'Chủ trọ' : 'Quản lý'}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
             {isLoading && <div className="text-center text-slate-400 text-sm py-4">Đang tải tin nhắn...</div>}
             {error && <div className="text-center text-rose-500 text-sm py-4 bg-rose-50 rounded-lg">{error}</div>}
             

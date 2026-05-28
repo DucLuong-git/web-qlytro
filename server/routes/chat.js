@@ -65,20 +65,26 @@ router.get('/my-room', protect, async (req, res) => {
         const tenantRecord = await Tenant.findOne({ email: req.user.email });
         
         if (tenantRecord) {
-           // 1. Tạo phòng chat mới
-           const newRoom = await ChatRoom.create({ 
-             tenantId: tenantRecord._id, 
-             name: `Phòng hỗ trợ - ${req.user.name}` 
-           });
+           // 1. Tìm hoặc tạo phòng chat mới
+           let newRoom = await ChatRoom.findOne({ tenantId: tenantRecord._id });
+           if (!newRoom) {
+             newRoom = await ChatRoom.create({ 
+               tenantId: tenantRecord._id, 
+               name: `Phòng hỗ trợ - ${req.user.name}` 
+             });
+           }
            
            // 2. Lấy danh sách toàn bộ Admin/Owner
            const admins = await User.find({ role: { $in: ['ADMIN', 'OWNER'] } });
            
-           // 3. Đưa Tenant và các Admin vào phòng
+           // 3. Đưa Tenant và các Admin vào phòng (Bỏ qua nếu đã có)
            const participantsToInsert = [
-             { roomId: newRoom._id, userId: req.user._id },
-             ...admins.map(admin => ({ roomId: newRoom._id, userId: admin._id }))
+             { roomId: newRoom._id, userId: req.user._id, role: 'TENANT' },
+             ...admins.map(admin => ({ roomId: newRoom._id, userId: admin._id, role: admin.role }))
            ];
+           
+           // Xoá tất cả participants cũ của phòng này (nếu bị kẹt do lỗi trước đó)
+           await ChatParticipant.deleteMany({ roomId: newRoom._id });
            
            await ChatParticipant.insertMany(participantsToInsert);
            

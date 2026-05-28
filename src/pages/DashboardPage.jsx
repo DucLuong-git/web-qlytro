@@ -17,10 +17,11 @@ const DashboardPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // VNPay Modal States
   const [vnpayModalOpen, setVnpayModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [lastUpdatedInvoiceId, setLastUpdatedInvoiceId] = useState(null);
   
   // Admin Auto Mail State
   const [isSendingMail, setIsSendingMail] = useState(false);
@@ -70,12 +71,21 @@ const DashboardPage = () => {
 
   useEffect(() => {
     if (socket) {
-      socket.on('invoice_updated', (data) => {
+      const handler = (data) => {
         addNotification(data.message, 'success');
         loadInvoices(); // Refresh the list
-      });
+        setLastUpdatedInvoiceId(data.invoiceId);
+      };
+      socket.on('invoice_updated', handler);
+      return () => socket.off('invoice_updated', handler);
     }
   }, [socket]);
+
+  useEffect(() => {
+    if (lastUpdatedInvoiceId && selectedInvoice && (selectedInvoice.id === lastUpdatedInvoiceId || selectedInvoice._id === lastUpdatedInvoiceId)) {
+      setPaymentSuccess(true);
+    }
+  }, [lastUpdatedInvoiceId, selectedInvoice]);
 
   useEffect(() => {
     // Kiểm tra nếu redirect về từ VNPay
@@ -97,6 +107,8 @@ const DashboardPage = () => {
 
   const openVNPay = (inv) => {
     setSelectedInvoice(inv);
+    setPaymentSuccess(false);
+    setLastUpdatedInvoiceId(null);
     setVnpayModalOpen(true);
   };
 
@@ -305,43 +317,59 @@ const DashboardPage = () => {
                  <p className="text-emerald-100 text-sm mt-1 relative z-10">Mở app Ngân hàng để quét mã thanh toán hóa đơn này.</p>
                </div>
                
-                 <div className="p-8">
-                 <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-2xl p-6 text-center mb-6 shadow-inner">
-                    <p className="font-medium text-slate-500 dark:text-slate-400 text-sm border-b border-slate-200 dark:border-slate-700 pb-3 mb-3">Thanh toán hoá đơn: <span className="font-bold text-slate-900 dark:text-white">Phòng {selectedInvoice.roomId?.name || selectedInvoice.id}</span></p>
-                    <div className="text-4xl font-black text-emerald-600 dark:text-emerald-400">{getTotal(selectedInvoice).toLocaleString('vi-VN')} VNĐ</div>
-                    
-                    {/* QR CODE DYNAMIC RENDER */}
-                    <div className="mt-6 flex justify-center">
-                       <div className="w-48 h-48 bg-white p-2 rounded-xl shadow-sm border border-slate-200 relative animate-pulse-glow">
-                          {config ? (
-                            <img 
-                              src={buildVietQrUrl({
-                                bankId: config.bankInfo.bankId,
-                                accountNo: config.bankInfo.accountNo,
-                                accountName: config.bankInfo.accountName,
-                                amount: getTotal(selectedInvoice),
-                                content: getQrContent(selectedInvoice)
-                              })} 
-                              alt="QR Thanh Toán"
-                              className="w-full h-full object-contain"
-                            />
-                          ) : (
-                            <div className="flex items-center justify-center w-full h-full text-xs text-slate-400">Đang tải QR...</div>
-                          )}
-                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm">
-                             <div className="w-8 h-8 rounded-full border border-emerald-500 flex items-center justify-center font-bold text-[10px] text-emerald-600">PAY</div>
-                          </div>
+               <div className="p-8">
+                 {paymentSuccess ? (
+                   <div className="text-center bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-2xl p-8 mb-6 shadow-inner animate-in fade-in zoom-in duration-300">
+                     <div className="flex justify-center mb-6">
+                       <div className="w-24 h-24 rounded-full border-[4px] border-emerald-500 flex items-center justify-center bg-emerald-50 dark:bg-emerald-900/30">
+                         <Check className="w-12 h-12 text-emerald-500 animate-[pulse_1s_ease-in-out_infinite]" />
                        </div>
-                    </div>
-                    <p className="text-xs text-text-muted mt-3 font-medium flex items-center justify-center"><CheckCircle className="w-3.5 h-3.5 mr-1 text-emerald-500" /> Hệ thống tự động duyệt sau 2-5 phút.</p>
-                 </div>
+                     </div>
+                     <p className="text-lg font-medium text-slate-600 dark:text-slate-300 mb-2">Quý khách đã thanh toán thành công</p>
+                     <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mb-2">
+                       {getTotal(selectedInvoice).toLocaleString('vi-VN')} VNĐ
+                     </p>
+                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                       cho hoá đơn phòng <span className="font-bold text-slate-700 dark:text-white">{selectedInvoice.roomId?.name || selectedInvoice.id}</span>
+                     </p>
+                   </div>
+                 ) : (
+                   <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-2xl p-6 text-center mb-6 shadow-inner">
+                      <p className="font-medium text-slate-500 dark:text-slate-400 text-sm border-b border-slate-200 dark:border-slate-700 pb-3 mb-3">Thanh toán hoá đơn: <span className="font-bold text-slate-900 dark:text-white">Phòng {selectedInvoice.roomId?.name || selectedInvoice.id}</span></p>
+                      <div className="text-4xl font-black text-emerald-600 dark:text-emerald-400">{getTotal(selectedInvoice).toLocaleString('vi-VN')} VNĐ</div>
+                      
+                      {/* QR CODE DYNAMIC RENDER */}
+                      <div className="mt-6 flex justify-center">
+                         <div className="w-48 h-48 bg-white p-2 rounded-xl shadow-sm border border-slate-200 relative animate-pulse-glow">
+                            {config ? (
+                              <img 
+                                src={buildVietQrUrl({
+                                  bankId: config.bankInfo.bankId,
+                                  accountNo: config.bankInfo.accountNo,
+                                  amount: getTotal(selectedInvoice),
+                                  content: getQrContent(selectedInvoice)
+                                })} 
+                                alt="QR Thanh Toán"
+                                className="w-full h-full object-contain"
+                              />
+                            ) : (
+                              <div className="flex items-center justify-center w-full h-full text-xs text-slate-400">Đang tải QR...</div>
+                            )}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm">
+                               <div className="w-8 h-8 rounded-full border border-emerald-500 flex items-center justify-center font-bold text-[10px] text-emerald-600">PAY</div>
+                            </div>
+                         </div>
+                      </div>
+                      <p className="text-xs text-text-muted mt-3 font-medium flex items-center justify-center"><CheckCircle className="w-3.5 h-3.5 mr-1 text-emerald-500" /> Hệ thống tự động duyệt sau 2-5 phút.</p>
+                   </div>
+                 )}
                  
                  <div className="flex justify-center">
                    <button 
                      onClick={() => setVnpayModalOpen(false)}
                      className="w-full max-w-[200px] px-4 py-3 bg-white border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-colors"
                    >
-                     Đóng
+                     {paymentSuccess ? 'Hoàn tất' : 'Đóng'}
                    </button>
                  </div>
                </div>

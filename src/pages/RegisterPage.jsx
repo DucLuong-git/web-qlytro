@@ -106,170 +106,203 @@ const RegisterPage = () => {
   ) : null;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-colors duration-300 relative overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none">
-        <div className="absolute -top-[25%] -left-[10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 blur-3xl" />
-        <div className="absolute top-[60%] -right-[10%] w-[40%] h-[60%] rounded-full bg-emerald-500/10 blur-3xl" />
-      </div>
+    <div className="min-h-screen bg-[#f0f4f9] dark:bg-slate-900 flex flex-col items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="w-full max-w-[500px] bg-white dark:bg-slate-800 rounded-[28px] p-8 sm:p-12 my-8"
+        style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.05)' }}
+      >
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <div className="w-16 h-16 rounded-full bg-[#1a73e8] flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-full border-4 border-[#8ab4f8] bg-[#1a73e8]" />
+          </div>
+        </div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 text-center">
-        <Link to="/" className="inline-flex items-center justify-center mb-6 group">
-          <div className="w-14 h-14 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-2xl flex items-center justify-center text-white font-black text-base shadow-xl shadow-indigo-600/30 group-hover:scale-110 transition-transform">DL</div>
-        </Link>
-        <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Tạo Tài Khoản Mới</h2>
-        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-          Đã có tài khoản?{' '}
-          <Link to="/login" className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Đăng nhập tại đây</Link>
+        <h1 className="text-2xl sm:text-3xl font-normal text-center text-[#202124] dark:text-white mb-2 tracking-tight">
+          Tạo tài khoản
+        </h1>
+        <p className="text-center text-[15px] text-[#5f6368] dark:text-slate-400 mb-8">
+          để tiếp tục sử dụng dịch vụ
         </p>
-      </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-xl relative z-10 animate-in slide-in-from-bottom-8 duration-500 px-4">
-        <div className="bg-white dark:bg-slate-800 py-10 px-6 shadow-2xl rounded-[2rem] border border-slate-100 dark:border-slate-700/50">
-          
-          <div className="flex items-center justify-center gap-2 mb-6 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl px-4 py-2 border border-emerald-100 dark:border-emerald-800">
-            <ShieldCheck className="w-4 h-4" /> Thông tin được mã hoá & bảo mật hoàn toàn
+        <form onSubmit={handleRegister} className="space-y-6" noValidate>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+              className="text-[#d93025] text-sm text-center bg-[#fce8e6] py-2 px-3 rounded-lg font-medium"
+            >
+              {error}
+            </motion.div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Name Input */}
+            <div>
+              <div className="relative group">
+                <input
+                  type="text" name="name" id="name" required maxLength={80}
+                  value={formData.name} onChange={handleChange} disabled={loading}
+                  className={`block w-full px-0 py-3 text-[#202124] dark:text-white bg-transparent border-0 border-b-2 appearance-none focus:outline-none focus:ring-0 peer transition-colors ${fieldErrors.name ? 'border-[#d93025]' : 'border-[#e0e0e0] dark:border-slate-600 focus:border-[#1a73e8]'}`}
+                  placeholder=" "
+                />
+                <label
+                  htmlFor="name"
+                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.name ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8]'}`}
+                >
+                  Họ và Tên
+                </label>
+              </div>
+              <FieldError field="name" />
+            </div>
+
+            {/* Phone Input */}
+            <div>
+              <div className="relative group">
+                <input
+                  type="tel" name="phone" id="phone" required maxLength={15}
+                  value={formData.phone} onChange={handleChange} disabled={loading}
+                  className={`block w-full px-0 py-3 text-[#202124] dark:text-white bg-transparent border-0 border-b-2 appearance-none focus:outline-none focus:ring-0 peer transition-colors ${fieldErrors.phone ? 'border-[#d93025]' : 'border-[#e0e0e0] dark:border-slate-600 focus:border-[#1a73e8]'}`}
+                  placeholder=" "
+                />
+                <label
+                  htmlFor="phone"
+                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.phone ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8]'}`}
+                >
+                  Số điện thoại
+                </label>
+              </div>
+              <FieldError field="phone" />
+            </div>
           </div>
 
-          <form className="space-y-5" onSubmit={handleRegister} noValidate>
-            {error && (
-              <div className="flex items-start gap-2 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl text-sm font-medium">
-                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" /> {error}
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Name */}
-              <div className="space-y-1.5">
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Họ và Tên <span className="text-red-500">*</span></label>
-                <div className="relative">
-                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
-                  <input type="text" name="name" required maxLength={80}
-                    value={formData.name} onChange={handleChange}
-                    className={`${inputCls} ${fieldErrors.name ? 'border-red-400' : ''}`}
-                    placeholder="Nguyễn Văn A"
-                  />
-                </div>
-                <FieldError field="name" />
-              </div>
-
-              {/* Phone */}
-              <div className="space-y-1.5">
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Số Điện Thoại <span className="text-red-500">*</span></label>
-                <div className="relative">
-                  <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
-                  <input type="tel" name="phone" required maxLength={15}
-                    value={formData.phone} onChange={handleChange}
-                    className={`${inputCls} ${fieldErrors.phone ? 'border-red-400' : ''}`}
-                    placeholder="0901 234 567"
-                  />
-                </div>
-                <FieldError field="phone" />
-              </div>
-            </div>
-
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Địa Chỉ Email <span className="text-red-500">*</span></label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
-                <input type="email" name="email" required maxLength={100}
-                  value={formData.email} onChange={handleChange}
-                  className={`${inputCls} ${fieldErrors.email ? 'border-red-400' : ''}`}
-                  placeholder="ban@email.com"
-                  autoComplete="email"
-                />
-              </div>
-              <FieldError field="email" />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Password */}
-              <div className="space-y-1.5">
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Mật Khẩu <span className="text-red-500">*</span></label>
-                <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
-                  <input type={showPw ? 'text' : 'password'} name="password" required maxLength={128}
-                    value={formData.password} onChange={handleChange}
-                    className={`${inputWithIconRCls} ${fieldErrors.password ? 'border-red-400' : ''}`}
-                    placeholder="••••••••"
-                    autoComplete="new-password"
-                  />
-                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors">
-                    {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-                {strength && (
-                  <div className="mt-1.5">
-                    <div className="w-full bg-slate-200 dark:bg-slate-600 rounded-full h-1.5">
-                      <div className={`${strength.color} h-1.5 rounded-full transition-all duration-500`} style={{ width: strength.w }} />
-                    </div>
-                    <span className={`text-[10px] font-black ${strength.color.replace('bg-', 'text-')}`}>{strength.label}</span>
-                  </div>
-                )}
-                <FieldError field="password" />
-              </div>
-
-              {/* Confirm Password */}
-              <div className="space-y-1.5">
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Xác Nhận Mật Khẩu <span className="text-red-500">*</span></label>
-                <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
-                  <input type={showConfirm ? 'text' : 'password'} name="confirmPassword" required maxLength={128}
-                    value={formData.confirmPassword} onChange={handleChange}
-                    className={`${inputWithIconRCls} ${fieldErrors.confirmPassword ? 'border-red-400' : formData.confirmPassword && formData.password === formData.confirmPassword ? 'border-emerald-400' : ''}`}
-                    placeholder="••••••••"
-                    autoComplete="new-password"
-                  />
-                  <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors">
-                    {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-                {formData.confirmPassword && formData.password === formData.confirmPassword && (
-                  <p className="text-emerald-500 text-xs font-bold flex items-center"><CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Mật khẩu khớp!</p>
-                )}
-                <FieldError field="confirmPassword" />
-              </div>
-            </div>
-
-            {/* Terms */}
-            <div className="flex items-start gap-3 py-1">
-              <input id="terms" name="terms" type="checkbox" required
-                className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 dark:border-slate-600 rounded cursor-pointer"
+          {/* Email Input */}
+          <div>
+            <div className="relative group">
+              <input
+                type="email" name="email" id="email" required maxLength={100} autoComplete="email"
+                value={formData.email} onChange={handleChange} disabled={loading}
+                className={`block w-full px-0 py-3 text-[#202124] dark:text-white bg-transparent border-0 border-b-2 appearance-none focus:outline-none focus:ring-0 peer transition-colors ${fieldErrors.email ? 'border-[#d93025]' : 'border-[#e0e0e0] dark:border-slate-600 focus:border-[#1a73e8]'}`}
+                placeholder=" "
               />
-              <label htmlFor="terms" className="text-sm text-slate-600 dark:text-slate-400 cursor-pointer leading-relaxed">
-                Tôi đồng ý với{' '}
-                <Link to="/info/terms" className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Điều Khoản Dịch Vụ</Link>
-                {' '}và{' '}
-                <Link to="/info/privacy" className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Chính Sách Bảo Mật</Link>
+              <label
+                htmlFor="email"
+                className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.email ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8]'}`}
+              >
+                Địa chỉ Email
               </label>
             </div>
+            <FieldError field="email" />
+          </div>
 
-            {/* Cloudflare Turnstile */}
-            <div className="flex justify-center border-t border-slate-100 dark:border-slate-700 pt-3 pb-1">
-              <Turnstile 
-                siteKey="1x00000000000000000000AA" // Dummy key
-                onSuccess={(token) => setTurnstileToken(token)} 
-                options={{
-                  theme: 'auto',
-                  language: 'vi'
-                }}
-              />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Password Input */}
+            <div>
+              <div className="relative group">
+                <input
+                  type={showPw ? 'text' : 'password'} name="password" id="password" required maxLength={128} autoComplete="new-password"
+                  value={formData.password} onChange={handleChange} disabled={loading}
+                  className={`block w-full px-0 py-3 pr-8 text-[#202124] dark:text-white bg-transparent border-0 border-b-2 appearance-none focus:outline-none focus:ring-0 peer transition-colors ${fieldErrors.password ? 'border-[#d93025]' : 'border-[#e0e0e0] dark:border-slate-600 focus:border-[#1a73e8]'}`}
+                  placeholder=" "
+                />
+                <label
+                  htmlFor="password"
+                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.password ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8]'}`}
+                >
+                  Mật khẩu
+                </label>
+                <button
+                  type="button" onClick={() => setShowPw(!showPw)}
+                  className="absolute right-0 top-3 text-[#5f6368] hover:text-[#202124] dark:hover:text-white transition-colors"
+                  tabIndex="-1"
+                >
+                  {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              <FieldError field="password" />
+              {strength && (
+                <div className="mt-2">
+                  <div className="w-full bg-[#e0e0e0] dark:bg-slate-700 rounded-full h-1">
+                    <div className={`${strength.color.replace('bg-', 'bg-').replace('500', '600')} h-1 rounded-full transition-all duration-500`} style={{ width: strength.w }} />
+                  </div>
+                  <span className={`text-[11px] font-medium mt-1 inline-block ${strength.color.replace('bg-', 'text-')}`}>{strength.label}</span>
+                </div>
+              )}
             </div>
 
-            <button type="submit" disabled={loading}
-              className="group w-full flex justify-center items-center py-4 rounded-xl shadow-lg shadow-indigo-600/30 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
+            {/* Confirm Password Input */}
+            <div>
+              <div className="relative group">
+                <input
+                  type={showConfirm ? 'text' : 'password'} name="confirmPassword" id="confirmPassword" required maxLength={128} autoComplete="new-password"
+                  value={formData.confirmPassword} onChange={handleChange} disabled={loading}
+                  className={`block w-full px-0 py-3 pr-8 text-[#202124] dark:text-white bg-transparent border-0 border-b-2 appearance-none focus:outline-none focus:ring-0 peer transition-colors ${fieldErrors.confirmPassword ? 'border-[#d93025]' : formData.confirmPassword && formData.password === formData.confirmPassword ? 'border-[#34A853]' : 'border-[#e0e0e0] dark:border-slate-600 focus:border-[#1a73e8]'}`}
+                  placeholder=" "
+                />
+                <label
+                  htmlFor="confirmPassword"
+                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.confirmPassword ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8]'}`}
+                >
+                  Xác nhận
+                </label>
+                <button
+                  type="button" onClick={() => setShowConfirm(!showConfirm)}
+                  className="absolute right-0 top-3 text-[#5f6368] hover:text-[#202124] dark:hover:text-white transition-colors"
+                  tabIndex="-1"
+                >
+                  {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              <FieldError field="confirmPassword" />
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 pt-2">
+            <input id="terms" name="terms" type="checkbox" required
+              className="mt-0.5 w-4 h-4 rounded border-[#e0e0e0] text-[#1a73e8] focus:ring-[#1a73e8] focus:ring-offset-0 cursor-pointer"
+            />
+            <label htmlFor="terms" className="text-[13px] text-[#5f6368] dark:text-slate-400 cursor-pointer">
+              Tôi đồng ý với{' '}
+              <Link to="/info/terms" className="font-medium text-[#1a73e8] hover:text-[#174ea6]">Điều Khoản</Link>
+              {' '}và{' '}
+              <Link to="/info/privacy" className="font-medium text-[#1a73e8] hover:text-[#174ea6]">Bảo Mật</Link>
+            </label>
+          </div>
+
+          <div className="flex justify-center -mb-2">
+            <Turnstile 
+              siteKey="1x00000000000000000000AA"
+              onSuccess={(token) => setTurnstileToken(token)} 
+              options={{ theme: 'auto', language: 'vi', size: 'compact' }}
+            />
+          </div>
+
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#1a73e8] hover:bg-[#174ea6] text-white font-medium text-[15px] py-2.5 rounded-[4px] transition-colors disabled:opacity-70 flex justify-center items-center h-[44px]"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                <span className="flex items-center">
-                  Tạo Tài Khoản Ngay <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </span>
+                "ĐĂNG KÝ"
               )}
             </button>
-          </form>
+          </div>
+        </form>
+
+        <div className="mt-8 text-center">
+          <p className="text-[14px] text-[#5f6368] dark:text-slate-400">
+            Đã có tài khoản?{' '}
+            <Link to="/login" className="font-medium text-[#1a73e8] hover:text-[#174ea6] transition-colors">
+              Đăng nhập ngay
+            </Link>
+          </p>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

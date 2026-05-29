@@ -115,7 +115,7 @@ const LoginPage = () => {
             />
             <label
               htmlFor="email"
-              className="absolute text-[15px] text-[#5f6368] dark:text-slate-400 duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-[#1a73e8] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className="absolute text-[15px] text-[#5f6368] dark:text-slate-400 duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
               Email
             </label>
@@ -136,7 +136,7 @@ const LoginPage = () => {
             />
             <label
               htmlFor="password"
-              className="absolute text-[15px] text-[#5f6368] dark:text-slate-400 duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-[#1a73e8] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className="absolute text-[15px] text-[#5f6368] dark:text-slate-400 duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
               Mật khẩu
             </label>
@@ -157,7 +157,7 @@ const LoginPage = () => {
                 Duy trì đăng nhập
               </span>
             </label>
-            <Link to="/forgot-password" className="text-[13px] font-medium text-[#1a73e8] hover:text-[#174ea6] transition-colors uppercase tracking-wide">
+            <Link to="/forgot-password" className="text-[13px] font-medium text-[#1a73e8] hover:text-[#174ea6] dark:text-[#8ab4f8] dark:hover:text-[#aecbfa] transition-colors uppercase tracking-wide">
               Quên mật khẩu?
             </Link>
           </div>
@@ -174,7 +174,7 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={loading || isLocked()}
-              className="w-full bg-[#1a73e8] hover:bg-[#174ea6] text-white font-medium text-[15px] py-2.5 rounded-[4px] transition-colors disabled:opacity-70 flex justify-center items-center h-[44px]"
+              className="w-full bg-[#1a73e8] hover:bg-[#174ea6] dark:bg-[#8ab4f8] dark:hover:bg-[#aecbfa] dark:text-[#202124] text-white font-medium text-[15px] py-2.5 rounded-[4px] transition-colors disabled:opacity-70 flex justify-center items-center h-[44px]"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -212,7 +212,7 @@ const LoginPage = () => {
         <div className="mt-8 text-center">
           <p className="text-[14px] text-[#5f6368] dark:text-slate-400">
             Chưa có tài khoản?{' '}
-            <Link to="/register" className="font-medium text-[#1a73e8] hover:text-[#174ea6] transition-colors">
+            <Link to="/register" className="font-medium text-[#1a73e8] hover:text-[#174ea6] dark:text-[#8ab4f8] dark:hover:text-[#aecbfa] transition-colors">
               Tạo tài khoản
             </Link>
           </p>

@@ -4,6 +4,7 @@ import { User, Mail, Lock, Phone, ArrowRight, Eye, EyeOff, ShieldCheck, CheckCir
 import api from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { Turnstile } from '@marsidev/react-turnstile';
+import { motion } from 'framer-motion';
 
 const sanitize = (str) => str.replace(/[<>"']/g, '').trim();
 
@@ -150,7 +151,7 @@ const RegisterPage = () => {
                 />
                 <label
                   htmlFor="name"
-                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.name ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8]'}`}
+                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.name ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
                 >
                   Họ và Tên
                 </label>
@@ -169,7 +170,7 @@ const RegisterPage = () => {
                 />
                 <label
                   htmlFor="phone"
-                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.phone ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8]'}`}
+                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.phone ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
                 >
                   Số điện thoại
                 </label>
@@ -189,7 +190,7 @@ const RegisterPage = () => {
               />
               <label
                 htmlFor="email"
-                className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.email ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8]'}`}
+                className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.email ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
               >
                 Địa chỉ Email
               </label>
@@ -209,7 +210,7 @@ const RegisterPage = () => {
                 />
                 <label
                   htmlFor="password"
-                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.password ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8]'}`}
+                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.password ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
                 >
                   Mật khẩu
                 </label>
@@ -243,7 +244,7 @@ const RegisterPage = () => {
                 />
                 <label
                   htmlFor="confirmPassword"
-                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.confirmPassword ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8]'}`}
+                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.confirmPassword ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
                 >
                   Xác nhận
                 </label>
@@ -265,9 +266,9 @@ const RegisterPage = () => {
             />
             <label htmlFor="terms" className="text-[13px] text-[#5f6368] dark:text-slate-400 cursor-pointer">
               Tôi đồng ý với{' '}
-              <Link to="/info/terms" className="font-medium text-[#1a73e8] hover:text-[#174ea6]">Điều Khoản</Link>
+              <Link to="/info/terms" className="font-medium text-[#1a73e8] hover:text-[#174ea6] dark:text-[#8ab4f8] dark:hover:text-[#aecbfa]">Điều Khoản</Link>
               {' '}và{' '}
-              <Link to="/info/privacy" className="font-medium text-[#1a73e8] hover:text-[#174ea6]">Bảo Mật</Link>
+              <Link to="/info/privacy" className="font-medium text-[#1a73e8] hover:text-[#174ea6] dark:text-[#8ab4f8] dark:hover:text-[#aecbfa]">Bảo Mật</Link>
             </label>
           </div>
 
@@ -283,7 +284,7 @@ const RegisterPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#1a73e8] hover:bg-[#174ea6] text-white font-medium text-[15px] py-2.5 rounded-[4px] transition-colors disabled:opacity-70 flex justify-center items-center h-[44px]"
+              className="w-full bg-[#1a73e8] hover:bg-[#174ea6] dark:bg-[#8ab4f8] dark:hover:bg-[#aecbfa] dark:text-[#202124] text-white font-medium text-[15px] py-2.5 rounded-[4px] transition-colors disabled:opacity-70 flex justify-center items-center h-[44px]"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

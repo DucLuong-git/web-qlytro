@@ -77,8 +77,15 @@ const LoginPage = () => {
         style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.05)' }}
       >
         {/* Logo */}
-        <div className="flex justify-center mb-6">
-          <img src="/favicon.svg" alt="Logo" className="w-16 h-16 drop-shadow-sm" />
+        <div className="flex justify-center mb-8">
+          <Link to="/" className="inline-flex items-center gap-3 group select-none">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-xl shadow-md group-hover:scale-105 transition-transform bg-gradient-to-br from-[#ff385c] to-[#d0003a]">
+              DL
+            </div>
+            <span className="text-[28px] font-black text-[#222222] dark:text-white tracking-tighter">
+              Đức Lương <span className="text-[#ff385c]">Home</span>
+            </span>
+          </Link>
         </div>
 
         <h1 className="text-2xl sm:text-3xl font-normal text-center text-[#202124] dark:text-white mb-2 tracking-tight">

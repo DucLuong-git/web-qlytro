@@ -151,7 +151,7 @@ const RegisterPage = () => {
                 />
                 <label
                   htmlFor="name"
-                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.name ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
+                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 origin-[0] pointer-events-none peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.name ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
                 >
                   Họ và Tên
                 </label>
@@ -170,7 +170,7 @@ const RegisterPage = () => {
                 />
                 <label
                   htmlFor="phone"
-                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.phone ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
+                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 origin-[0] pointer-events-none peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.phone ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
                 >
                   Số điện thoại
                 </label>
@@ -190,7 +190,7 @@ const RegisterPage = () => {
               />
               <label
                 htmlFor="email"
-                className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.email ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
+                className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 origin-[0] pointer-events-none peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.email ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
               >
                 Địa chỉ Email
               </label>
@@ -210,7 +210,7 @@ const RegisterPage = () => {
                 />
                 <label
                   htmlFor="password"
-                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.password ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
+                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 origin-[0] pointer-events-none peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.password ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
                 >
                   Mật khẩu
                 </label>
@@ -244,7 +244,7 @@ const RegisterPage = () => {
                 />
                 <label
                   htmlFor="confirmPassword"
-                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.confirmPassword ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
+                  className={`absolute text-[15px] duration-200 transform -translate-y-6 scale-75 top-3 origin-[0] pointer-events-none peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${fieldErrors.confirmPassword ? 'text-[#d93025]' : 'text-[#5f6368] dark:text-slate-400 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8]'}`}
                 >
                   Xác nhận
                 </label>

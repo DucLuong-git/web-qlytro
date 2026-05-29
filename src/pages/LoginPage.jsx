@@ -115,7 +115,7 @@ const LoginPage = () => {
             />
             <label
               htmlFor="email"
-              className="absolute text-[15px] text-[#5f6368] dark:text-slate-400 duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className="absolute text-[15px] text-[#5f6368] dark:text-slate-400 duration-200 transform -translate-y-6 scale-75 top-3 origin-[0] pointer-events-none peer-focus:left-0 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
               Email
             </label>
@@ -136,7 +136,7 @@ const LoginPage = () => {
             />
             <label
               htmlFor="password"
-              className="absolute text-[15px] text-[#5f6368] dark:text-slate-400 duration-200 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className="absolute text-[15px] text-[#5f6368] dark:text-slate-400 duration-200 transform -translate-y-6 scale-75 top-3 origin-[0] pointer-events-none peer-focus:left-0 peer-focus:text-[#1a73e8] dark:peer-focus:text-[#8ab4f8] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
               Mật khẩu
             </label>

@@ -6,9 +6,10 @@ const Log = require('../models/Log');
 const ChatRoom = require('../models/ChatRoom');
 const ChatParticipant = require('../models/ChatParticipant');
 const User = require('../models/User');
+const { protect, authorize } = require('../middleware/auth');
 
 // Get all tenants
-router.get('/', async (req, res) => {
+router.get('/', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const tenants = await Tenant.find().sort({ createdAt: -1 });
     const transformed = tenants.map(t => {
@@ -25,7 +26,7 @@ router.get('/', async (req, res) => {
 });
 
 // Create tenant
-router.post('/', async (req, res) => {
+router.post('/', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const payload = { ...req.body };
     if (payload.roomId && typeof payload.roomId === 'string') {
@@ -109,7 +110,7 @@ router.post('/', async (req, res) => {
 });
 
 // Update tenant
-router.put('/:id', async (req, res) => {
+router.put('/:id', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const tenant = await Tenant.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!tenant) return res.status(404).json({ message: 'Tenant not found' });
@@ -131,7 +132,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete tenant
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const tenant = await Tenant.findByIdAndDelete(req.params.id);
     if (!tenant) return res.status(404).json({ message: 'Tenant not found' });

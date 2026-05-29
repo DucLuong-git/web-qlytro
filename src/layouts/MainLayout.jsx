@@ -69,7 +69,7 @@ const MainLayout = () => {
   const navLinks = [
     { to: '/',      label: 'Trang Chủ' },
     { to: '/rooms', label: 'Tìm Phòng' },
-    ...(isAuthenticated && (user?.role === 'ADMIN' || user?.role === 'STAFF')
+    ...(isAuthenticated && (user?.role === 'ADMIN' || user?.role === 'OWNER')
       ? [{ to: '/post-room', label: 'Đăng Phòng' }]
       : []),
   ];
@@ -233,12 +233,14 @@ const MainLayout = () => {
                       <Link to="/profile" className="block px-3 py-2.5 text-sm font-500 text-[var(--ash-gray)] hover:text-[var(--ink-black)] dark:hover:text-white hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 rounded-xl transition-colors">
                         Hồ Sơ Cá Nhân
                       </Link>
-                      {(user?.role === 'ADMIN' || user?.role === 'STAFF') && (
+                      {(user?.role === 'ADMIN' || user?.role === 'OWNER') && (
                         <>
                           <div className="h-px bg-[var(--hairline-gray)] dark:bg-slate-700 mx-2 my-1" />
-                          <Link to="/admin" className="block px-3 py-2.5 text-sm font-600 hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 rounded-xl transition-colors" style={{ color: 'var(--rausch)' }}>
-                            Quản Trị Hệ Thống
-                          </Link>
+                          {user?.role === 'ADMIN' && (
+                            <Link to="/admin" className="block px-3 py-2.5 text-sm font-600 hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 rounded-xl transition-colors" style={{ color: 'var(--rausch)' }}>
+                              Quản Trị Hệ Thống
+                            </Link>
+                          )}
                           <Link to="/post-room" className="block px-3 py-2.5 text-sm font-500 text-[var(--ash-gray)] hover:text-[var(--ink-black)] dark:hover:text-white hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 rounded-xl transition-colors">
                             Đăng Phòng Mới
                           </Link>
@@ -314,12 +316,14 @@ const MainLayout = () => {
                     <Link to="/profile" className="flex items-center px-4 py-3 rounded-xl text-sm font-500 text-[var(--ash-gray)] hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 transition-colors">
                       Hồ Sơ Của Tôi
                     </Link>
-                    {(user?.role === 'ADMIN' || user?.role === 'STAFF') && (
+                    {(user?.role === 'ADMIN' || user?.role === 'OWNER') && (
                       <>
                         <div className="h-px bg-[var(--hairline-gray)] dark:bg-slate-800 my-3 mx-2" />
-                        <Link to="/admin" className="flex items-center px-4 py-3 rounded-xl text-sm font-700 transition-colors" style={{ color: 'var(--rausch)' }}>
-                          Quản Trị Hệ Thống
-                        </Link>
+                        {user?.role === 'ADMIN' && (
+                          <Link to="/admin" className="flex items-center px-4 py-3 rounded-xl text-sm font-700 transition-colors" style={{ color: 'var(--rausch)' }}>
+                            Quản Trị Hệ Thống
+                          </Link>
+                        )}
                         <Link to="/post-room" className="flex items-center px-4 py-3 rounded-xl text-sm font-500 text-[var(--ash-gray)] hover:bg-[var(--soft-cloud)] dark:hover:bg-slate-800 transition-colors">
                           Đăng Phòng Mới
                         </Link>

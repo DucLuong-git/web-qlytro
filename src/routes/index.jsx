@@ -75,6 +75,12 @@ export const router = createBrowserRouter([
             path: 'profile',
             element: <ProfilePage />,
           },
+        ],
+      },
+      {
+        path: '/',
+        element: <PrivateRoute allowedRoles={['ADMIN', 'OWNER']} />,
+        children: [
           {
             path: 'post-room',
             element: <PostRoomPage />,
@@ -85,8 +91,8 @@ export const router = createBrowserRouter([
   },
   {
     path: '/admin',
-    // We restrict this entire branch to ADMIN and STAFF
-    element: <PrivateRoute allowedRoles={['ADMIN', 'STAFF']} />,
+    // We restrict this entire branch to ADMIN only (Owner cannot access dashboard)
+    element: <PrivateRoute allowedRoles={['ADMIN']} />,
     children: [
       {
         path: '',

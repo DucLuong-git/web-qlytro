@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Contract = require('../models/Contract');
+const { protect, authorize } = require('../middleware/auth');
 
 // Get all contracts
-router.get('/', async (req, res) => {
+router.get('/', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const contracts = await Contract.find().sort({ createdAt: -1 });
     const transformed = contracts.map(c => {
@@ -18,7 +19,7 @@ router.get('/', async (req, res) => {
 });
 
 // Update contract
-router.put('/:id', async (req, res) => {
+router.put('/:id', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const contract = await Contract.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!contract) return res.status(404).json({ message: 'Contract not found' });

@@ -4,6 +4,7 @@ const Invoice = require('../models/Invoice');
 const ConfigService = require('../models/ConfigService');
 const Room = require('../models/Room');
 const Transaction = require('../models/Transaction');
+const { protect, authorize } = require('../middleware/auth');
 const { upload, uploadToCloudinary } = require('../middleware/cloudinaryUpload');
 const { sendInvoiceEmail, buildZaloTemplate } = require('../middleware/mailer');
 
@@ -18,7 +19,7 @@ const calcTotal = (invoice) => {
 // ═══════════════════════════════════════════════════════════════════
 // GET /api/invoices — List hóa đơn (có lọc theo period, status, roomId)
 // ═══════════════════════════════════════════════════════════════════
-router.get('/', async (req, res) => {
+router.get('/', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const { period, status, roomId, page = 1, limit = 50 } = req.query;
     const filter = {};
@@ -45,7 +46,7 @@ router.get('/', async (req, res) => {
 // ═══════════════════════════════════════════════════════════════════
 // GET /api/invoices/config — Lấy config giá mới nhất
 // ═══════════════════════════════════════════════════════════════════
-router.get('/config', async (req, res) => {
+router.get('/config', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const config = await ConfigService.findOne().sort({ effectiveDate: -1 });
     if (!config) {
@@ -60,7 +61,7 @@ router.get('/config', async (req, res) => {
 // ═══════════════════════════════════════════════════════════════════
 // PUT /api/invoices/config — Tạo hoặc cập nhật config giá
 // ═══════════════════════════════════════════════════════════════════
-router.put('/config', async (req, res) => {
+router.put('/config', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const config = new ConfigService({ ...req.body, effectiveDate: new Date() });
     await config.save();
@@ -75,7 +76,7 @@ router.put('/config', async (req, res) => {
 // GET /api/invoices/smart-fetch?period=YYYY-MM — Smart Fetch oldIndex
 // Trả về: danh sách phòng kèm oldIndex (= newIndex tháng trước)
 // ═══════════════════════════════════════════════════════════════════
-router.get('/smart-fetch', async (req, res) => {
+router.get('/smart-fetch', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const { period } = req.query;
     if (!period) return res.status(400).json({ success: false, message: 'Thiếu period.' });
@@ -143,7 +144,7 @@ router.get('/smart-fetch', async (req, res) => {
 // ═══════════════════════════════════════════════════════════════════
 // GET /api/invoices/:id — Chi tiết 1 hóa đơn
 // ═══════════════════════════════════════════════════════════════════
-router.get('/:id', async (req, res) => {
+router.get('/:id', protect, authorize('ADMIN', 'TENANT'), async (req, res) => {
   try {
     const invoice = await Invoice.findById(req.params.id)
       .populate('roomId', 'name address district price');
@@ -157,7 +158,7 @@ router.get('/:id', async (req, res) => {
 // ═══════════════════════════════════════════════════════════════════
 // POST /api/invoices — Tạo hóa đơn mới
 // ═══════════════════════════════════════════════════════════════════
-router.post('/', async (req, res) => {
+router.post('/', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const body = req.body;
 
@@ -202,7 +203,7 @@ router.post('/', async (req, res) => {
 // PUT /api/invoices/bulk-save — Lưu tập trung nhiều hóa đơn 1 lúc
 // Body: { period, invoices: [ { roomId, electric, water, services, roomFee, note } ] }
 // ═══════════════════════════════════════════════════════════════════
-router.put('/bulk-save', async (req, res) => {
+router.put('/bulk-save', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const { period, invoices: rows } = req.body;
     if (!period || !Array.isArray(rows)) {
@@ -281,7 +282,7 @@ router.put('/bulk-save', async (req, res) => {
 // ═══════════════════════════════════════════════════════════════════
 // PUT /api/invoices/:id — Cập nhật hóa đơn
 // ═══════════════════════════════════════════════════════════════════
-router.put('/:id', async (req, res) => {
+router.put('/:id', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const body = req.body;
 
@@ -332,7 +333,7 @@ router.put('/:id', async (req, res) => {
 // ═══════════════════════════════════════════════════════════════════
 // POST /api/invoices/:id/upload-evidence — Upload ảnh minh chứng
 // ═══════════════════════════════════════════════════════════════════
-router.post('/:id/upload-evidence', upload.single('evidence'), async (req, res) => {
+router.post('/:id/upload-evidence', protect, authorize('ADMIN', 'TENANT'), upload.single('evidence'), async (req, res) => {
   try {
     const invoice = await Invoice.findById(req.params.id).populate('roomId', 'name');
     if (!invoice) return res.status(404).json({ success: false, message: 'Không tìm thấy hóa đơn.' });
@@ -355,7 +356,7 @@ router.post('/:id/upload-evidence', upload.single('evidence'), async (req, res) 
 // ═══════════════════════════════════════════════════════════════════
 // POST /api/invoices/:id/send-notification — Gửi email + Zalo template
 // ═══════════════════════════════════════════════════════════════════
-router.post('/:id/send-notification', async (req, res) => {
+router.post('/:id/send-notification', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const invoice = await Invoice.findById(req.params.id)
       .populate('roomId', 'name address price');
@@ -403,7 +404,7 @@ router.post('/:id/send-notification', async (req, res) => {
 // ═══════════════════════════════════════════════════════════════════
 // DELETE /api/invoices/:id
 // ═══════════════════════════════════════════════════════════════════
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', protect, authorize('ADMIN'), async (req, res) => {
   try {
     const invoice = await Invoice.findByIdAndDelete(req.params.id);
     if (!invoice) return res.status(404).json({ success: false, message: 'Không tìm thấy hóa đơn.' });

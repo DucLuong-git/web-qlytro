@@ -117,9 +117,7 @@ const RegisterPage = () => {
       >
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 rounded-full bg-[#1a73e8] flex items-center justify-center shadow-sm">
-            <div className="w-8 h-8 rounded-full border-4 border-[#8ab4f8] bg-[#1a73e8]" />
-          </div>
+          <img src="/favicon.svg" alt="Logo" className="w-16 h-16 drop-shadow-sm" />
         </div>
 
         <h1 className="text-2xl sm:text-3xl font-normal text-center text-[#202124] dark:text-white mb-2 tracking-tight">
